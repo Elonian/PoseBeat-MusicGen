@@ -2,3 +2,10 @@ data/*
 !data/.gitkeep
 works/*
 !works/.gitkeep
+cache_weights/*
+!cache_weights/.gitkeep
+__pycache__/
+*.py[cod]
+.pytest_cache/
+logs/
+outputs/

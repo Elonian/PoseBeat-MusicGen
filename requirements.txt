@@ -1,0 +1,17 @@
+# Training stack tested in the current workspace.
+torch>=2.11.0
+torchaudio>=2.11.0
+diffusers>=0.38.0
+transformers>=5.9.0
+accelerate>=1.13.0
+safetensors>=0.7.0
+huggingface_hub>=1.16.0
+hf_transfer>=0.1.9
+
+# Data, audio, and logging utilities.
+numpy>=2.4.0
+scipy>=1.17.0
+soundfile>=0.13.0
+PyYAML>=6.0
+tqdm>=4.67.0
+tensorboard>=2.20.0
