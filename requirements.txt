@@ -1,17 +1,24 @@
-# Training stack tested in the current workspace.
-torch>=2.11.0
-torchaudio>=2.11.0
-diffusers>=0.38.0
-transformers>=5.9.0
-accelerate>=1.13.0
-safetensors>=0.7.0
-huggingface_hub>=1.16.0
-hf_transfer>=0.1.9
+# Motion-conditioned latent audio training stack.
+torch
+torchvision
+torchaudio
+diffusers==0.18.1
+accelerate==0.20.3
+audiodiffusion
+datasets==2.13.1
+huggingface_hub==0.16.4
+pyarrow<15
+fsspec<=2023.10.0
 
 # Data, audio, and logging utilities.
-numpy>=2.4.0
-scipy>=1.17.0
-soundfile>=0.13.0
-PyYAML>=6.0
-tqdm>=4.67.0
-tensorboard>=2.20.0
+numpy
+pandas
+scipy
+librosa
+soundfile
+pydub
+Pillow
+PyYAML
+tqdm
+tensorboard
+frechet_audio_distance

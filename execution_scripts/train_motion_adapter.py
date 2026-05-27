@@ -12,9 +12,7 @@ from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from models import MotionAdapter, MotionAdapterConfig, MotionConditionedAudioGenerator
-from models.audio_generator import freeze_module, load_audio_generator_components
-from utils.checkpoints import save_training_checkpoint
+from utils.audio_latents import encode_images_to_latents
 from utils.config import as_path, load_config, optional, require
 from utils.logging import (
     JsonlMetricLogger,
@@ -24,93 +22,221 @@ from utils.logging import (
     log_config,
     setup_logging,
 )
-from utils.motion_dataset import (
-    MotionLatentDataset,
-    collate_motion_latents,
-    infer_motion_dim,
-)
+from utils.motion_dataset import MelConditionDataset, collate_mel_conditions
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Train the motion adapter for the music generator.")
+def make_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Train the motion-conditioned latent audio UNet."
+    )
     parser.add_argument("--config", default="configs/motion_audio_adapter.yaml")
     parser.add_argument("--device", default=None)
     parser.add_argument("--resume", default=None)
-    args = parser.parse_args()
+    parser.add_argument("--from-pretrained", default=None)
+    parser.add_argument("--limit", type=int, default=None)
+    return parser
+
+
+def _make_ema_model(unet: torch.nn.Module, cfg: dict):
+    if not bool(optional(cfg, "training.use_ema", True)):
+        return None
+    from diffusers.training_utils import EMAModel
+
+    return EMAModel(
+        unet,
+        inv_gamma=float(optional(cfg, "training.ema_inv_gamma", 1.0)),
+        power=float(optional(cfg, "training.ema_power", 0.75)),
+        max_value=float(optional(cfg, "training.ema_max_decay", 0.9999)),
+    )
+
+
+def _ema_step(ema_model, unet: torch.nn.Module) -> None:
+    if ema_model is None:
+        return
+    try:
+        ema_model.step(unet)
+    except TypeError:
+        ema_model.step(unet.parameters())
+
+
+def _save_pipeline_with_optional_ema(
+    path: Path,
+    *,
+    unet: torch.nn.Module,
+    vae: torch.nn.Module,
+    scheduler,
+    mel_config: dict,
+    ema_model,
+) -> None:
+    from models import save_audio_pipeline
+
+    if ema_model is None:
+        save_audio_pipeline(path, unet=unet, vae=vae, scheduler=scheduler, mel_config=mel_config)
+        return
+
+    stored = False
+    if hasattr(ema_model, "store"):
+        ema_model.store(unet.parameters())
+        stored = True
+    ema_model.copy_to(unet.parameters())
+    save_audio_pipeline(path, unet=unet, vae=vae, scheduler=scheduler, mel_config=mel_config)
+    if stored and hasattr(ema_model, "restore"):
+        ema_model.restore(unet.parameters())
+
+
+def _load_training_components(
+    cfg: dict,
+    *,
+    device: torch.device,
+    dtype: torch.dtype,
+    condition_dim: int,
+    image_shape: tuple[int, int, int],
+    from_pretrained: str | None,
+):
+    from models import create_conditioned_unet, create_noise_scheduler, load_audio_pipeline_components
+
+    if from_pretrained:
+        components = load_audio_pipeline_components(
+            from_pretrained,
+            device=device,
+            dtype=dtype,
+            load_unet=True,
+            load_vae=True,
+            load_scheduler=True,
+        )
+        assert components.unet is not None
+        assert components.vae is not None
+        assert components.scheduler is not None
+        return components
+
+    vae_dir = as_path(require(cfg, "paths.vae_checkpoint_dir"))
+    components = load_audio_pipeline_components(
+        vae_dir,
+        device=device,
+        dtype=dtype,
+        load_unet=False,
+        load_vae=True,
+        load_scheduler=False,
+    )
+    assert components.vae is not None
+
+    channels, height, width = image_shape
+    with torch.no_grad():
+        latent = components.vae.encode(
+            torch.zeros((1, channels, height, width), device=device, dtype=dtype)
+        ).latent_dist.sample()
+
+    components.unet = create_conditioned_unet(
+        sample_size=tuple(latent.shape[-2:]),
+        cross_attention_dim=condition_dim,
+        in_channels=int(components.vae.config.latent_channels),
+        out_channels=int(components.vae.config.latent_channels),
+    ).to(device=device, dtype=dtype)
+    components.scheduler = create_noise_scheduler(
+        str(optional(cfg, "training.scheduler", "ddim")),
+        int(optional(cfg, "training.num_train_steps", 1000)),
+    )
+    return components
+
+
+def train_from_args(args: argparse.Namespace) -> None:
+    from models import freeze_module
 
     cfg = load_config(args.config)
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
     dtype = torch.float32
     output_dir = as_path(require(cfg, "paths.output_dir"))
-    logger = setup_logging(
-        output_dir / "logs",
-        name="posebeat.train",
-        filename="train_motion_adapter.log",
-    )
+    logger = setup_logging(output_dir / "logs", name="posebeat.train", filename="train_motion_adapter.log")
     log_config(logger, cfg)
     logger.info("device=%s dtype=%s", device, dtype)
 
-    dataset = MotionLatentDataset(
+    dataset = MelConditionDataset(
+        require(cfg, "paths.train_mel_dataset_dir"),
         require(cfg, "paths.train_motion_pickle"),
-        require(cfg, "paths.train_latent_dir"),
-        strict=bool(optional(cfg, "training.strict_latent_cache", True)),
+        split=str(optional(cfg, "data.dataset_split", "train")),
+        image_channels=int(optional(cfg, "model.image_channels", 1)),
+        strict=bool(optional(cfg, "data.strict_condition_match", True)),
+        limit=args.limit or optional(cfg, "training.max_train_samples", None),
     )
-    motion_dim = int(optional(cfg, "model.motion_dim", 0)) or infer_motion_dim(dataset.encodings)
-    adapter_config = MotionAdapterConfig(
-        motion_dim=motion_dim,
-        hidden_dim=int(optional(cfg, "model.hidden_dim", 512)),
-        num_layers=int(optional(cfg, "model.num_layers", 4)),
-        num_heads=int(optional(cfg, "model.num_heads", 8)),
-        dropout=float(optional(cfg, "model.dropout", 0.1)),
-        max_motion_frames=int(optional(cfg, "model.max_motion_frames", 256)),
-        primary_cross_attention_dim=int(optional(cfg, "model.primary_cross_attention_dim", 768)),
-        secondary_cross_attention_dim=int(optional(cfg, "model.secondary_cross_attention_dim", 1024)),
+    first = dataset[0]
+    image_shape = tuple(first["image"].shape)
+    condition_shape = tuple(first["conditioning"].shape)
+    condition_dim = int(first["conditioning"].shape[-1])
+    logger.info(
+        "training pairs=%d image_shape=%s condition_shape=%s",
+        len(dataset),
+        image_shape,
+        condition_shape,
     )
-    logger.info("training pairs=%d motion_dim=%d", len(dataset), motion_dim)
 
-    components = load_audio_generator_components(
-        require(cfg, "paths.audio_generator_checkpoint_dir"),
+    pretrained = args.from_pretrained or optional(cfg, "paths.from_pretrained_model_dir", None)
+    components = _load_training_components(
+        cfg,
         device=device,
         dtype=dtype,
-        load_vae=False,
-        load_vocoder=False,
+        condition_dim=condition_dim,
+        image_shape=image_shape,
+        from_pretrained=pretrained,
     )
-    freeze_module(components.unet)
+    assert components.unet is not None
+    assert components.vae is not None
+    assert components.scheduler is not None
+    freeze_module(components.vae)
 
-    adapter = MotionAdapter(adapter_config).to(device=device, dtype=dtype)
-    model = MotionConditionedAudioGenerator(components.unet, adapter)
-    logger.info(
-        "unet params=%s frozen_trainable=%s",
-        format_count(count_parameters(components.unet)),
-        format_count(count_parameters(components.unet, trainable_only=True)),
-    )
-    logger.info(
-        "adapter params=%s trainable=%s",
-        format_count(count_parameters(adapter)),
-        format_count(count_parameters(adapter, trainable_only=True)),
-    )
+    logger.info("unet params=%s", format_count(count_parameters(components.unet)))
+    logger.info("vae params=%s frozen", format_count(count_parameters(components.vae)))
+    logger.info("cross_attention_dim=%d", components.unet.config.cross_attention_dim)
+
     optimizer = torch.optim.AdamW(
-        adapter.parameters(),
+        components.unet.parameters(),
         lr=float(optional(cfg, "training.learning_rate", 1e-4)),
-        weight_decay=float(optional(cfg, "training.weight_decay", 1e-2)),
+        betas=(
+            float(optional(cfg, "training.adam_beta1", 0.95)),
+            float(optional(cfg, "training.adam_beta2", 0.999)),
+        ),
+        weight_decay=float(optional(cfg, "training.weight_decay", 1e-6)),
+        eps=float(optional(cfg, "training.adam_epsilon", 1e-8)),
     )
+    ema_model = _make_ema_model(components.unet, cfg)
+    if ema_model is not None:
+        logger.info("EMA enabled")
 
+    global_step = 0
+    start_epoch = 0
     if args.resume:
         state = torch.load(args.resume, map_location=device)
-        adapter.load_state_dict(state["adapter"])
+        components.unet.load_state_dict(state["unet"])
         if "optimizer" in state:
             optimizer.load_state_dict(state["optimizer"])
+        if ema_model is not None and state.get("ema") is not None:
+            ema_model.load_state_dict(state["ema"])
+        global_step = int(state.get("step", 0))
+        start_epoch = int(state.get("epoch", 0))
         logger.info("resumed checkpoint: %s", args.resume)
 
     dataloader = DataLoader(
         dataset,
-        batch_size=int(optional(cfg, "training.batch_size", 4)),
+        batch_size=int(optional(cfg, "training.batch_size", 8)),
         shuffle=True,
         num_workers=int(optional(cfg, "training.num_workers", 2)),
-        collate_fn=collate_motion_latents,
+        collate_fn=collate_mel_conditions,
         pin_memory=device.type == "cuda",
         drop_last=True,
     )
+
+    total_epochs = int(optional(cfg, "training.epochs", 100))
+    total_steps = max(1, len(dataloader) * total_epochs)
+    lr_scheduler = None
+    scheduler_name = optional(cfg, "training.lr_scheduler", None)
+    if scheduler_name:
+        from diffusers.optimization import get_scheduler
+
+        lr_scheduler = get_scheduler(
+            str(scheduler_name),
+            optimizer=optimizer,
+            num_warmup_steps=int(optional(cfg, "training.lr_warmup_steps", 500)),
+            num_training_steps=total_steps,
+        )
 
     checkpoint_dir = output_dir / "checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -121,20 +247,32 @@ def main() -> None:
 
         writer = SummaryWriter(log_dir=str(output_dir / "tensorboard"))
 
-    global_step = 0
-    epochs = int(optional(cfg, "training.epochs", 20))
-    save_every = int(optional(cfg, "training.save_every_steps", 1000))
+    save_every_steps = int(optional(cfg, "training.save_every_steps", 1000))
+    save_every_epochs = int(optional(cfg, "training.save_every_epochs", 10))
     log_every = int(optional(cfg, "logging.log_every_steps", 25))
     grad_clip = float(optional(cfg, "training.gradient_clip", 1.0))
     loss_meter = RunningAverage()
+    mel_config = {
+        "x_res": int(optional(cfg, "audio.x_res", 256)),
+        "y_res": int(optional(cfg, "audio.y_res", 256)),
+        "sample_rate": int(optional(cfg, "audio.sample_rate", 22050)),
+        "hop_length": int(optional(cfg, "audio.hop_length", 512)),
+        "n_fft": int(optional(cfg, "audio.n_fft", 2048)),
+        "top_db": int(optional(cfg, "audio.top_db", 80)),
+        "n_iter": int(optional(cfg, "audio.n_iter", 32)),
+    }
 
-    model.train()
-    for epoch in range(epochs):
-        logger.info("starting epoch=%d/%d", epoch + 1, epochs)
-        progress = tqdm(dataloader, desc=f"epoch-{epoch}")
+    components.unet.train()
+    for epoch in range(start_epoch, total_epochs):
+        logger.info("starting epoch=%d/%d", epoch + 1, total_epochs)
+        progress = tqdm(dataloader, desc=f"train-epoch-{epoch}")
         for batch in progress:
-            clean_latents = batch["latents"].to(device=device, dtype=dtype)
-            motion = batch["motion"].to(device=device, dtype=dtype)
+            clean_images = batch["image"].to(device=device, dtype=dtype)
+            conditioning = batch["conditioning"].to(device=device, dtype=dtype)
+
+            with torch.no_grad():
+                clean_latents = encode_images_to_latents(components.vae, clean_images)
+
             noise = torch.randn_like(clean_latents)
             timesteps = torch.randint(
                 0,
@@ -143,14 +281,20 @@ def main() -> None:
                 device=device,
             ).long()
             noisy_latents = components.scheduler.add_noise(clean_latents, noise, timesteps)
-
-            noise_pred = model(noisy_latents, timesteps, motion)
+            noise_pred = components.unet(
+                noisy_latents,
+                timesteps,
+                encoder_hidden_states=conditioning,
+            ).sample
             loss = F.mse_loss(noise_pred.float(), noise.float())
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(adapter.parameters(), grad_clip)
+            torch.nn.utils.clip_grad_norm_(components.unet.parameters(), grad_clip)
             optimizer.step()
+            _ema_step(ema_model, components.unet)
+            if lr_scheduler is not None:
+                lr_scheduler.step()
 
             global_step += 1
             loss_meter.update(loss.item(), clean_latents.shape[0])
@@ -179,31 +323,51 @@ def main() -> None:
                     writer.add_scalar("train/learning_rate", lr, global_step)
                 loss_meter.reset()
 
-            if global_step % save_every == 0:
-                checkpoint_path = checkpoint_dir / f"adapter_step_{global_step}.pt"
-                save_training_checkpoint(
+            if save_every_steps > 0 and global_step % save_every_steps == 0:
+                checkpoint_path = checkpoint_dir / f"unet_step_{global_step}.pt"
+                torch.save(
+                    {
+                        "unet": components.unet.state_dict(),
+                        "optimizer": optimizer.state_dict(),
+                        "ema": ema_model.state_dict() if ema_model is not None else None,
+                        "step": global_step,
+                        "epoch": epoch,
+                        "config": cfg,
+                    },
                     checkpoint_path,
-                    adapter=adapter,
-                    optimizer=optimizer,
-                    step=global_step,
-                    epoch=epoch,
-                    config=cfg,
                 )
-                logger.info("saved checkpoint: %s", checkpoint_path)
+                logger.info("saved training checkpoint: %s", checkpoint_path)
 
-    final_path = checkpoint_dir / "adapter_final.pt"
-    save_training_checkpoint(
-        final_path,
-        adapter=adapter,
-        optimizer=optimizer,
-        step=global_step,
-        epoch=epochs,
-        config=cfg,
+        if save_every_epochs > 0 and (epoch + 1) % save_every_epochs == 0:
+            pipeline_dir = output_dir / f"pipeline_epoch_{epoch + 1:04d}"
+            _save_pipeline_with_optional_ema(
+                pipeline_dir,
+                unet=components.unet,
+                vae=components.vae,
+                scheduler=components.scheduler,
+                mel_config=mel_config,
+                ema_model=ema_model,
+            )
+            logger.info("saved audio pipeline: %s", pipeline_dir)
+
+    final_pipeline_dir = output_dir / "pipeline_final"
+    _save_pipeline_with_optional_ema(
+        final_pipeline_dir,
+        unet=components.unet,
+        vae=components.vae,
+        scheduler=components.scheduler,
+        mel_config=mel_config,
+        ema_model=ema_model,
     )
-    logger.info("saved final checkpoint: %s", final_path)
+    logger.info("saved final audio pipeline: %s", final_pipeline_dir)
     metric_logger.close()
     if writer is not None:
         writer.close()
+
+
+def main(argv: list[str] | None = None) -> None:
+    args = make_arg_parser().parse_args(argv)
+    train_from_args(args)
 
 
 if __name__ == "__main__":
