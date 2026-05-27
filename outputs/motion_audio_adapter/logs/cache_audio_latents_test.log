@@ -1,0 +1,123 @@
+2026-05-25 06:28:19 | INFO | posebeat.cache | logging to /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_audio_adapter/logs/cache_audio_latents_test.log
+2026-05-25 06:28:19 | INFO | posebeat.cache | config:
+audio:
+  audio_length_seconds: 5.0
+logging:
+  log_every_steps: 25
+  tensorboard: true
+model:
+  dropout: 0.1
+  hidden_dim: 512
+  max_motion_frames: 256
+  motion_dim: 0
+  num_heads: 8
+  num_layers: 4
+  primary_cross_attention_dim: 768
+  secondary_cross_attention_dim: 1024
+paths:
+  audio_generator_checkpoint_dir: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/music_generator
+  output_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_audio_adapter
+  test_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/test/wavs_sliced
+  test_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/audio_latents/test
+  test_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/data_and_model/conditions/normalized_all_test_data_01.pkl
+  train_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/train/wavs_sliced
+  train_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/audio_latents/train
+  train_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/data_and_model/conditions/normalized_all_train_data_01.pkl
+training:
+  batch_size: 4
+  epochs: 20
+  gradient_clip: 1.0
+  learning_rate: 0.0001
+  num_workers: 2
+  save_every_steps: 1000
+  strict_latent_cache: false
+  weight_decay: 0.01
+2026-05-25 06:28:19 | INFO | posebeat.cache | split=test device=cpu dtype=torch.float32
+2026-05-25 06:28:19 | INFO | posebeat.cache | audio generator checkpoint: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/cvssp_audioldm2-music
+2026-05-25 06:28:19 | INFO | posebeat.cache | motion pickle: /mntdatalora/src/PoseBeat-MusicGen/data/data_and_model/conditions/normalized_all_test_data_01.pkl
+2026-05-25 06:28:19 | INFO | posebeat.cache | audio dir: /mntdatalora/src/PoseBeat-MusicGen/data/test/wavs_sliced
+2026-05-25 06:28:19 | INFO | posebeat.cache | latent dir: /mntdatalora/src/PoseBeat-MusicGen/data/audio_latents/test
+2026-05-25 06:28:19 | INFO | posebeat.cache | motion items selected: 1
+2026-05-25 06:28:19 | INFO | posebeat.cache | cache complete: cached=1 skipped_existing=0 failed=0
+2026-05-25 06:28:46 | INFO | posebeat.cache | logging to /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_audio_adapter/logs/cache_audio_latents_test.log
+2026-05-25 06:28:46 | INFO | posebeat.cache | config:
+audio:
+  audio_length_seconds: 5.0
+logging:
+  log_every_steps: 25
+  tensorboard: true
+model:
+  dropout: 0.1
+  hidden_dim: 512
+  max_motion_frames: 256
+  motion_dim: 0
+  num_heads: 8
+  num_layers: 4
+  primary_cross_attention_dim: 768
+  secondary_cross_attention_dim: 1024
+paths:
+  audio_generator_checkpoint_dir: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/music_generator
+  output_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_audio_adapter
+  test_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/test/wavs_sliced
+  test_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/audio_latents/test
+  test_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/data_and_model/conditions/normalized_all_test_data_01.pkl
+  train_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/train/wavs_sliced
+  train_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/audio_latents/train
+  train_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/data_and_model/conditions/normalized_all_train_data_01.pkl
+training:
+  batch_size: 4
+  epochs: 20
+  gradient_clip: 1.0
+  learning_rate: 0.0001
+  num_workers: 2
+  save_every_steps: 1000
+  strict_latent_cache: false
+  weight_decay: 0.01
+2026-05-25 06:28:46 | INFO | posebeat.cache | split=test device=cpu dtype=torch.float32
+2026-05-25 06:28:46 | INFO | posebeat.cache | audio generator checkpoint: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/music_generator
+2026-05-25 06:28:46 | INFO | posebeat.cache | motion pickle: /mntdatalora/src/PoseBeat-MusicGen/data/data_and_model/conditions/normalized_all_test_data_01.pkl
+2026-05-25 06:28:46 | INFO | posebeat.cache | audio dir: /mntdatalora/src/PoseBeat-MusicGen/data/test/wavs_sliced
+2026-05-25 06:28:46 | INFO | posebeat.cache | latent dir: /mntdatalora/src/PoseBeat-MusicGen/data/audio_latents/test
+2026-05-25 06:28:47 | INFO | posebeat.cache | motion items selected: 1
+2026-05-25 06:28:47 | INFO | posebeat.cache | cache complete: cached=0 skipped_existing=1 failed=0
+2026-05-25 06:29:40 | INFO | posebeat.cache | logging to /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_audio_adapter/logs/cache_audio_latents_test.log
+2026-05-25 06:29:40 | INFO | posebeat.cache | config:
+audio:
+  audio_length_seconds: 5.0
+logging:
+  log_every_steps: 25
+  tensorboard: true
+model:
+  dropout: 0.1
+  hidden_dim: 512
+  max_motion_frames: 256
+  motion_dim: 0
+  num_heads: 8
+  num_layers: 4
+  primary_cross_attention_dim: 768
+  secondary_cross_attention_dim: 1024
+paths:
+  audio_generator_checkpoint_dir: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/music_generator
+  output_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_audio_adapter
+  test_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/test/wavs_sliced
+  test_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/audio_latents/test
+  test_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/data_and_model/conditions/normalized_all_test_data_01.pkl
+  train_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/train/wavs_sliced
+  train_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/audio_latents/train
+  train_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/data_and_model/conditions/normalized_all_train_data_01.pkl
+training:
+  batch_size: 4
+  epochs: 20
+  gradient_clip: 1.0
+  learning_rate: 0.0001
+  num_workers: 2
+  save_every_steps: 1000
+  strict_latent_cache: false
+  weight_decay: 0.01
+2026-05-25 06:29:40 | INFO | posebeat.cache | split=test device=cpu dtype=torch.float32
+2026-05-25 06:29:40 | INFO | posebeat.cache | audio generator checkpoint: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/music_generator
+2026-05-25 06:29:40 | INFO | posebeat.cache | motion pickle: /mntdatalora/src/PoseBeat-MusicGen/data/data_and_model/conditions/normalized_all_test_data_01.pkl
+2026-05-25 06:29:40 | INFO | posebeat.cache | audio dir: /mntdatalora/src/PoseBeat-MusicGen/data/test/wavs_sliced
+2026-05-25 06:29:40 | INFO | posebeat.cache | latent dir: /mntdatalora/src/PoseBeat-MusicGen/data/audio_latents/test
+2026-05-25 06:29:40 | INFO | posebeat.cache | motion items selected: 1
+2026-05-25 06:29:40 | INFO | posebeat.cache | cache complete: cached=0 skipped_existing=1 failed=0
