@@ -76,8 +76,8 @@ def evaluate_genre_kld(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Compute official DMD genre KLD using MS-SincResNet.")
-    parser.add_argument("--config", default="configs/motion_audio_adapter.yaml")
+    parser = argparse.ArgumentParser(description="Compute genre KLD using MS-SincResNet.")
+    parser.add_argument("--config", default="configs/motion_to_music.yaml")
     parser.add_argument("--input-dir", default=None)
     parser.add_argument("--output-dir", default=None)
     parser.add_argument("--cdcd-list", default=None)

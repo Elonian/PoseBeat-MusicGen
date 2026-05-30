@@ -1,0 +1,72 @@
+paths:
+  data_root: /mntdatalora/src/PoseBeat-MusicGen/data/motion_to_music_aistpp_legacy_2026-05-26
+  train_mel_dataset_dir: /mntdatalora/src/PoseBeat-MusicGen/data/motion_to_music_aistpp_legacy_2026-05-26/data_and_model/input music/aistpp_256_sorted
+  vae_checkpoint_dir: /mntdatalora/src/PoseBeat-MusicGen/data/motion_to_music_aistpp_legacy_2026-05-26/data_and_model/model/all_01
+  pretrained_model_dir: /mntdatalora/src/PoseBeat-MusicGen/data/motion_to_music_aistpp_legacy_2026-05-26/data_and_model/model/all_01
+  from_pretrained_model_dir: null
+  train_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/motion_to_music_aistpp_legacy_2026-05-26/data_and_model/conditions/normalized_all_train_data_01.pkl
+  test_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/motion_to_music_aistpp_legacy_2026-05-26/data_and_model/conditions/normalized_all_test_data_01.pkl
+  train_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/motion_to_music_aistpp_legacy_2026-05-26/train/wavs_sliced
+  test_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/motion_to_music_aistpp_legacy_2026-05-26/test/wavs_sliced
+  train_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/motion_to_music_aistpp_legacy_2026-05-26/audio_latents/train
+  test_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/motion_to_music_aistpp_legacy_2026-05-26/audio_latents/test
+  cdcd_list: /mntdatalora/src/PoseBeat-MusicGen/configs/cdcd_aist.txt
+  output_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_to_music
+  log_dir: /mntdatalora/src/PoseBeat-MusicGen/logs/motion_to_music
+  generated_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_to_music/generated
+  normalized_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_to_music/normalized
+  genre_model_path: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/MS-SincResNet.tar
+
+data:
+  dataset_split: train
+  strict_condition_match: true
+
+audio:
+  x_res: 256
+  y_res: 256
+  sample_rate: 22050
+  hop_length: 512
+  n_fft: 2048
+  top_db: 80
+  n_iter: 32
+
+model:
+  image_channels: 1
+  motion_frames: 150
+  motion_dim: 370
+
+training:
+  batch_size: 32
+  epochs: 100
+  learning_rate: 0.0001
+  adam_beta1: 0.95
+  adam_beta2: 0.999
+  adam_epsilon: 0.00000001
+  weight_decay: 0.000001
+  gradient_clip: 1.0
+  num_workers: 3
+  scheduler: ddim
+  num_train_steps: 1000
+  lr_scheduler: cosine
+  lr_warmup_steps: 500
+  use_ema: true
+  ema_inv_gamma: 1.0
+  ema_power: 0.75
+  ema_max_decay: 0.9999
+  save_every_steps: 1000
+  save_every_epochs: 10
+  max_train_samples: null
+
+inference:
+  seed: 2391504374279719
+  eta: 0.0
+
+evaluation:
+  normalize_target_dbfs: -20.0
+  normalize_gain_db: 8.0
+  beat_motion_fps: 30
+  compute_fad: true
+
+logging:
+  log_every_steps: 25
+  tensorboard: true

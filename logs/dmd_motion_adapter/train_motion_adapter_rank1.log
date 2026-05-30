@@ -1,2 +1,0 @@
-2026-05-30 04:55:42 | INFO | posebeat.train.rank1 | logging to /mntdatalora/src/PoseBeat-MusicGen/logs/dmd_motion_adapter/train_motion_adapter_rank1.log
-2026-05-30 04:55:42 | INFO | posebeat.train.rank1 | rank=1 local_rank=1 world_size=2 distributed=True device=cuda:1 dtype=torch.float32

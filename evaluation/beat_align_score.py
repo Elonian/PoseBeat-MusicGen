@@ -120,8 +120,8 @@ def evaluate_bas(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Compute DMD-style beat alignment score.")
-    parser.add_argument("--config", default="configs/motion_audio_adapter.yaml")
+    parser = argparse.ArgumentParser(description="Compute beat alignment score.")
+    parser.add_argument("--config", default="configs/motion_to_music.yaml")
     parser.add_argument("--data-root", default=None)
     parser.add_argument("--motion-dir", default=None)
     parser.add_argument("--music-dir", default=None)

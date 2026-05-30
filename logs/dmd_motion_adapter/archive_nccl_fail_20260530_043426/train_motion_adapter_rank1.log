@@ -1,6 +1,0 @@
-2026-05-30 04:14:26 | INFO | posebeat.train.rank1 | logging to /mntdatalora/src/PoseBeat-MusicGen/logs/dmd_motion_adapter/train_motion_adapter_rank1.log
-2026-05-30 04:14:26 | INFO | posebeat.train.rank1 | rank=1 local_rank=1 world_size=2 distributed=True device=cuda:1 dtype=torch.float32
-2026-05-30 04:19:49 | INFO | posebeat.train.rank1 | training pairs=17733 image_shape=(1, 256, 256) condition_shape=(150, 370)
-2026-05-30 04:20:08 | INFO | posebeat.train.rank1 | unet params=138.26M
-2026-05-30 04:20:08 | INFO | posebeat.train.rank1 | vae params=83.61M frozen
-2026-05-30 04:20:08 | INFO | posebeat.train.rank1 | cross_attention_dim=370

@@ -64,7 +64,7 @@ def generate_one(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate audio with the motion-conditioned pipeline.")
-    parser.add_argument("--config", default="configs/motion_audio_adapter.yaml")
+    parser.add_argument("--config", default="configs/motion_to_music.yaml")
     parser.add_argument("--model-dir", default=None)
     parser.add_argument("--motion-key", default=None)
     parser.add_argument("--all-cdcd", action="store_true")

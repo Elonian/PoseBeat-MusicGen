@@ -9,6 +9,16 @@ import torch
 from torch.utils.data import Dataset
 
 
+def _normalize_image_size(image_size: int | tuple[int, int] | list[int] | None) -> tuple[int, int] | None:
+    if image_size is None:
+        return None
+    if isinstance(image_size, int):
+        return (image_size, image_size)
+    if len(image_size) != 2:
+        raise ValueError(f"image_size must be an int or [width, height], got {image_size}")
+    return (int(image_size[0]), int(image_size[1]))
+
+
 def load_motion_encodings(path: str | Path) -> dict[str, np.ndarray]:
     with open(path, "rb") as handle:
         encodings = pickle.load(handle)
@@ -41,8 +51,19 @@ def motion_key_from_audio_file(audio_file: str | Path) -> str:
     return Path(str(audio_file)).stem
 
 
-def image_to_mel_tensor(image: Any, *, channels: int = 1) -> torch.Tensor:
+def image_to_mel_tensor(
+    image: Any,
+    *,
+    channels: int = 1,
+    image_size: int | tuple[int, int] | list[int] | None = None,
+) -> torch.Tensor:
     """Match the reference ToTensor()+Normalize([0.5], [0.5]) preprocessing."""
+
+    size = _normalize_image_size(image_size)
+    if size is not None and image.size != size:
+        from PIL import Image
+
+        image = image.resize(size, resample=Image.Resampling.BICUBIC)
 
     if channels == 3:
         image = image.convert("RGB")
@@ -69,6 +90,7 @@ class MelConditionDataset(Dataset):
         *,
         split: str = "train",
         image_channels: int = 1,
+        image_size: int | tuple[int, int] | list[int] | None = None,
         strict: bool = True,
         limit: int | None = None,
     ):
@@ -82,6 +104,7 @@ class MelConditionDataset(Dataset):
             dataset = dataset[split]
         self.dataset = dataset
         self.image_channels = image_channels
+        self.image_size = _normalize_image_size(image_size)
 
         audio_files = list(self.dataset["audio_file"])
         pairs: list[tuple[int, str]] = []
@@ -111,7 +134,11 @@ class MelConditionDataset(Dataset):
     def __getitem__(self, index: int) -> dict[str, Any]:
         row_index, key = self.pairs[index]
         row = self.dataset[row_index]
-        image = image_to_mel_tensor(row["image"], channels=self.image_channels)
+        image = image_to_mel_tensor(
+            row["image"],
+            channels=self.image_channels,
+            image_size=self.image_size,
+        )
         conditioning = torch.as_tensor(np.asarray(self.encodings[key]), dtype=torch.float32)
         return {"key": key, "image": image, "conditioning": conditioning}
 

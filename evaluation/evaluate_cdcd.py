@@ -13,7 +13,7 @@ from utils.config import as_path, load_config, optional, require
 
 
 def beat_detect(audio: np.ndarray, sr: int = 22050) -> list[int]:
-    """Official DMD beat coverage/hit binning: one onset bin per second."""
+    """Reference beat coverage/hit binning: one onset bin per second."""
 
     import librosa
 
@@ -105,7 +105,7 @@ def evaluate_cdcd(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate CDCD beat coverage/hit and optional FAD.")
-    parser.add_argument("--config", default="configs/motion_audio_adapter.yaml")
+    parser.add_argument("--config", default="configs/motion_to_music.yaml")
     parser.add_argument("--input-dir", default=None)
     parser.add_argument("--output-dir", default=None)
     parser.add_argument("--cdcd-list", default=None)

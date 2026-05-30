@@ -21,7 +21,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Optionally cache VAE latents from the mel-image Arrow dataset."
     )
-    parser.add_argument("--config", default="configs/motion_audio_adapter.yaml")
+    parser.add_argument("--config", default="configs/motion_to_music.yaml")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--device", default=None)
     args = parser.parse_args()
@@ -42,6 +42,7 @@ def main() -> None:
         require(cfg, "paths.train_motion_pickle"),
         split=str(optional(cfg, "data.dataset_split", "train")),
         image_channels=int(optional(cfg, "model.image_channels", 1)),
+        image_size=optional(cfg, "data.image_size", None),
         strict=bool(optional(cfg, "data.strict_condition_match", True)),
         limit=args.limit,
     )

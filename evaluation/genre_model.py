@@ -10,7 +10,7 @@ import torchvision.models as models
 
 
 class SincConvFast(nn.Module):
-    """MS-SincResNet Sinc convolution layer used by the official DMD genre metric."""
+    """MS-SincResNet Sinc convolution layer used by the genre metric."""
 
     @staticmethod
     def to_mel(hz):

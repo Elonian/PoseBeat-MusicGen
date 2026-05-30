@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render one AIST++/DMD motion-conditioning sample beside its audio.
+"""Render one AIST++ motion-conditioning sample beside its audio.
 
 The output is a single GIF by default. It intentionally writes only the
 visualization artifact to the output directory.
@@ -18,7 +18,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DATA_ROOT = REPO_ROOT / "data" / "dmd_aistpp_legacy_2026-05-26"
+DEFAULT_DATA_ROOT = REPO_ROOT / "data" / "motion_to_music_aistpp_legacy_2026-05-26"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "outputs" / "aistpp_visualisations"
 
 SMPL_PARENTS = [
@@ -139,13 +139,13 @@ def resolve_audio(audio_dirs: list[Path], key: str) -> Path:
     raise FileNotFoundError(f"No wav found for {key}")
 
 
-def extract_dmd_joint_positions(encoding: np.ndarray) -> np.ndarray:
+def extract_conditioning_joint_positions(encoding: np.ndarray) -> np.ndarray:
     if encoding.ndim != 2 or encoding.shape[0] < 1:
         raise ValueError(f"Expected [frames, dim] encoding, got {encoding.shape}")
     motion_dim = encoding.shape[1] - 10 if encoding.shape[1] >= 370 else encoding.shape[1]
     if motion_dim < 360:
         raise ValueError(
-            f"Need at least 360 DMD motion channels to draw joint positions; got {encoding.shape[1]}"
+            f"Need at least 360 motion channels to draw joint positions; got {encoding.shape[1]}"
         )
     motion = encoding[:, :360].reshape(encoding.shape[0], 24, 15)
     return motion[:, :, 6:9].astype(np.float32)
@@ -249,7 +249,7 @@ def load_positions_for_key(
         raw_positions = load_raw_aist_positions(key, data_root, target_frames, data_fps)
         if raw_positions is not None:
             return raw_positions, "raw", "AIST++ raw SMPL motion"
-    return extract_dmd_joint_positions(encoding), "conditioning", "AIST++ DMD motion conditioning"
+    return extract_conditioning_joint_positions(encoding), "conditioning", "AIST++ motion conditioning"
 
 
 def make_waveform_points(audio: np.ndarray, width: int) -> tuple[np.ndarray, np.ndarray]:
@@ -314,7 +314,7 @@ def project_pose(
         y = pose[:, 1]
         depth = pose[:, 2]
     else:
-        # DMD preprocessing rotates AIST++ to z-up.
+        # The preprocessing rotates AIST++ to z-up.
         x = pose[:, 0]
         y = pose[:, 2]
         depth = pose[:, 1]
@@ -532,7 +532,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--condition-motion",
         action="store_true",
-        help="Draw normalized DMD condition positions instead of raw AIST++ FK when raw motion is available.",
+        help="Draw normalized condition positions instead of raw AIST++ FK when raw motion is available.",
     )
     return parser.parse_args()
 

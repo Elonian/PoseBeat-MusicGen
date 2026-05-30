@@ -37,8 +37,8 @@ def normalize_folder(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Normalize generated wav loudness like official DMD post_process.py.")
-    parser.add_argument("--config", default="configs/motion_audio_adapter.yaml")
+    parser = argparse.ArgumentParser(description="Normalize generated wav loudness for evaluation.")
+    parser.add_argument("--config", default="configs/motion_to_music.yaml")
     parser.add_argument("--input-dir", default=None)
     parser.add_argument("--output-dir", default=None)
     parser.add_argument("--target-dbfs", type=float, default=None)

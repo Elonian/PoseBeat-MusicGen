@@ -1,4 +1,8 @@
 data/
 works/
 cache_weights/
+logs/motion_to_music/
+logs/motion_to_music_hires/
+outputs/motion_to_music/
+outputs/motion_to_music_hires/
 *.pyc

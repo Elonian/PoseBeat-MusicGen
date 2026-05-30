@@ -1,1 +1,1 @@
-"""DMD-style evaluation helpers for PoseBeat-MusicGen."""
+"""Motion-to-music evaluation helpers for PoseBeat-MusicGen."""

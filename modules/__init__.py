@@ -11,6 +11,7 @@ from .audio_generator import (
     save_audio_pipeline,
 )
 from .motion_adapter import MotionAdapter, MotionAdapterConfig, MotionConditioning
+from .motion_to_music_unet import create_motion_conditioned_unet
 
 __all__ = [
     "AudioPipelineComponents",
@@ -19,6 +20,7 @@ __all__ = [
     "MotionConditionedUNet",
     "MotionConditioning",
     "create_conditioned_unet",
+    "create_motion_conditioned_unet",
     "create_noise_scheduler",
     "freeze_module",
     "load_audio_generator_components",

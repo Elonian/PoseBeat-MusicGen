@@ -33,7 +33,7 @@ def make_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Train the motion-conditioned latent audio UNet."
     )
-    parser.add_argument("--config", default="configs/motion_audio_adapter.yaml")
+    parser.add_argument("--config", default="configs/motion_to_music.yaml")
     parser.add_argument("--device", default=None)
     parser.add_argument("--resume", default=None)
     parser.add_argument("--from-pretrained", default=None)
@@ -153,7 +153,11 @@ def _load_training_components(
     image_shape: tuple[int, int, int],
     from_pretrained: str | None,
 ):
-    from modules import create_conditioned_unet, create_noise_scheduler, load_audio_pipeline_components
+    from modules import (
+        create_motion_conditioned_unet,
+        create_noise_scheduler,
+        load_audio_pipeline_components,
+    )
 
     if from_pretrained:
         components = load_audio_pipeline_components(
@@ -186,11 +190,12 @@ def _load_training_components(
             torch.zeros((1, channels, height, width), device=device, dtype=dtype)
         ).latent_dist.sample()
 
-    components.unet = create_conditioned_unet(
+    components.unet = create_motion_conditioned_unet(
         sample_size=tuple(latent.shape[-2:]),
         cross_attention_dim=condition_dim,
         in_channels=int(components.vae.config.latent_channels),
         out_channels=int(components.vae.config.latent_channels),
+        variant=str(optional(cfg, "model.unet_variant", "base")),
     ).to(device=device, dtype=dtype)
     components.scheduler = create_noise_scheduler(
         str(optional(cfg, "training.scheduler", "ddim")),
@@ -231,6 +236,7 @@ def train_from_args(args: argparse.Namespace) -> None:
         require(cfg, "paths.train_motion_pickle"),
         split=str(optional(cfg, "data.dataset_split", "train")),
         image_channels=int(optional(cfg, "model.image_channels", 1)),
+        image_size=optional(cfg, "data.image_size", None),
         strict=bool(optional(cfg, "data.strict_condition_match", True)),
         limit=args.limit or optional(cfg, "training.max_train_samples", None),
     )
@@ -261,6 +267,7 @@ def train_from_args(args: argparse.Namespace) -> None:
 
     logger.info("unet params=%s", format_count(count_parameters(components.unet)))
     logger.info("vae params=%s frozen", format_count(count_parameters(components.vae)))
+    logger.info("unet_variant=%s sample_size=%s", optional(cfg, "model.unet_variant", "base"), components.unet.config.sample_size)
     logger.info("cross_attention_dim=%d", components.unet.config.cross_attention_dim)
 
     train_unet: torch.nn.Module = components.unet
