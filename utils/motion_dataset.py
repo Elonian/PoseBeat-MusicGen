@@ -177,7 +177,13 @@ class MotionLatentDataset(Dataset):
             latents = latent_payload["latents"]
         else:
             latents = latent_payload
-        latents = latents.squeeze(0).to(torch.float32)
+        latents = latents.to(torch.float32)
+        if latents.ndim == 4 and latents.shape[0] == 1:
+            latents = latents.squeeze(0)
+        if latents.ndim != 3:
+            raise ValueError(
+                f"Expected cached latents [channels, height, width] for {key}, got {tuple(latents.shape)}"
+            )
         return {"key": key, "motion": motion, "latents": latents}
 
 
