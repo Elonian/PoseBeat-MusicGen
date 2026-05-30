@@ -1,8 +1,11 @@
-"""Model components for PoseBeat-MusicGen."""
+"""Backward-compatible re-exports for code that still imports ``models``."""
 
-from .audio_generator import (
+from modules import (
     AudioPipelineComponents,
+    MotionAdapter,
+    MotionAdapterConfig,
     MotionConditionedUNet,
+    MotionConditioning,
     create_conditioned_unet,
     create_noise_scheduler,
     freeze_module,
@@ -10,7 +13,6 @@ from .audio_generator import (
     load_audio_pipeline_components,
     save_audio_pipeline,
 )
-from .motion_adapter import MotionAdapter, MotionAdapterConfig, MotionConditioning
 
 __all__ = [
     "AudioPipelineComponents",
