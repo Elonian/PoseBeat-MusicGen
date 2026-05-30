@@ -1,0 +1,540 @@
+
+===== restart 2026-05-30T04:34:26+02:00 batch_size_per_gpu=12 nccl_p2p_disable=1 nccl_ib_disable=1 =====
+[PoseBeat] Installing Python requirements from requirements.txt
+Requirement already satisfied: torch in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 2)) (2.11.0+cu128)
+Requirement already satisfied: torchvision in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 3)) (0.26.0+cu128)
+Requirement already satisfied: torchaudio in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 4)) (2.11.0+cu128)
+Requirement already satisfied: diffusers==0.18.1 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 5)) (0.18.1)
+Requirement already satisfied: accelerate==0.20.3 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 6)) (0.20.3)
+Requirement already satisfied: audiodiffusion in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 7)) (1.5.7)
+Requirement already satisfied: datasets==2.13.1 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 8)) (2.13.1)
+Requirement already satisfied: huggingface_hub==0.16.4 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 9)) (0.16.4)
+Requirement already satisfied: pyarrow<15 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 10)) (14.0.2)
+Requirement already satisfied: fsspec==2023.6.0 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 11)) (2023.6.0)
+Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 14)) (1.26.4)
+Requirement already satisfied: pandas in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 15)) (3.0.3)
+Requirement already satisfied: scipy in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 16)) (1.17.1)
+Requirement already satisfied: librosa in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 17)) (0.11.0)
+Requirement already satisfied: soundfile in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 18)) (0.13.1)
+Requirement already satisfied: pydub in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 19)) (0.25.1)
+Requirement already satisfied: Pillow in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 20)) (12.2.0)
+Requirement already satisfied: PyYAML in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 21)) (6.0.3)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 22)) (4.67.3)
+Requirement already satisfied: tensorboard in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 23)) (2.20.0)
+Requirement already satisfied: frechet_audio_distance in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 24)) (0.3.4)
+Requirement already satisfied: importlib_metadata in /usr/local/lib/python3.12/dist-packages (from diffusers==0.18.1->-r requirements.txt (line 5)) (9.0.0)
+Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from diffusers==0.18.1->-r requirements.txt (line 5)) (3.25.2)
+Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.12/dist-packages (from diffusers==0.18.1->-r requirements.txt (line 5)) (2026.5.9)
+Requirement already satisfied: requests in /usr/local/lib/python3.12/dist-packages (from diffusers==0.18.1->-r requirements.txt (line 5)) (2.32.5)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from accelerate==0.20.3->-r requirements.txt (line 6)) (26.0)
+Requirement already satisfied: psutil in /usr/local/lib/python3.12/dist-packages (from accelerate==0.20.3->-r requirements.txt (line 6)) (7.2.2)
+Requirement already satisfied: dill<0.3.7,>=0.3.0 in /usr/local/lib/python3.12/dist-packages (from datasets==2.13.1->-r requirements.txt (line 8)) (0.3.6)
+Requirement already satisfied: xxhash in /usr/local/lib/python3.12/dist-packages (from datasets==2.13.1->-r requirements.txt (line 8)) (3.7.0)
+Requirement already satisfied: multiprocess in /usr/local/lib/python3.12/dist-packages (from datasets==2.13.1->-r requirements.txt (line 8)) (0.70.14)
+Requirement already satisfied: aiohttp in /usr/local/lib/python3.12/dist-packages (from datasets==2.13.1->-r requirements.txt (line 8)) (3.13.5)
+Requirement already satisfied: typing-extensions>=3.7.4.3 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub==0.16.4->-r requirements.txt (line 9)) (4.15.0)
+Requirement already satisfied: setuptools<82 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (81.0.0)
+Requirement already satisfied: sympy>=1.13.3 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (1.14.0)
+Requirement already satisfied: networkx>=2.5.1 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (3.6.1)
+Requirement already satisfied: jinja2 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (3.1.6)
+Requirement already satisfied: cuda-toolkit==12.8.1 in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.1)
+Requirement already satisfied: cuda-bindings<13,>=12.9.4 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (12.9.4)
+Requirement already satisfied: nvidia-cudnn-cu12==9.19.0.56 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (9.19.0.56)
+Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (0.7.1)
+Requirement already satisfied: nvidia-nccl-cu12==2.28.9 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (2.28.9)
+Requirement already satisfied: nvidia-nvshmem-cu12==3.4.5 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (3.4.5)
+Requirement already satisfied: triton==3.6.0 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (3.6.0)
+Requirement already satisfied: nvidia-cublas-cu12==12.8.4.1.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.4.1)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.8.90.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.90)
+Requirement already satisfied: nvidia-cufft-cu12==11.3.3.83.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (11.3.3.83)
+Requirement already satisfied: nvidia-cufile-cu12==1.13.1.3.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (1.13.1.3)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.8.90.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.90)
+Requirement already satisfied: nvidia-curand-cu12==10.3.9.90.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (10.3.9.90)
+Requirement already satisfied: nvidia-cusolver-cu12==11.7.3.90.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (11.7.3.90)
+Requirement already satisfied: nvidia-cusparse-cu12==12.5.8.93.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.5.8.93)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.8.93.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.93)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.8.93.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.93)
+Requirement already satisfied: nvidia-nvtx-cu12==12.8.90.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.90)
+Requirement already satisfied: cuda-pathfinder~=1.1 in /usr/local/lib/python3.12/dist-packages (from cuda-bindings<13,>=12.9.4->torch->-r requirements.txt (line 2)) (1.2.2)
+Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.12/dist-packages (from pandas->-r requirements.txt (line 15)) (2.9.0.post0)
+Requirement already satisfied: audioread>=2.1.9 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (3.1.0)
+Requirement already satisfied: numba>=0.51.0 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (0.65.1)
+Requirement already satisfied: scikit-learn>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (1.8.0)
+Requirement already satisfied: joblib>=1.0 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (1.5.3)
+Requirement already satisfied: decorator>=4.3.0 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (5.2.1)
+Requirement already satisfied: pooch>=1.1 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (1.9.0)
+Requirement already satisfied: soxr>=0.3.2 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (1.1.0)
+Requirement already satisfied: lazy_loader>=0.1 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (0.5)
+Requirement already satisfied: msgpack>=1.0 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (1.1.2)
+Requirement already satisfied: cffi>=1.0 in /usr/local/lib/python3.12/dist-packages (from soundfile->-r requirements.txt (line 18)) (2.0.0)
+Requirement already satisfied: absl-py>=0.4 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (2.4.0)
+Requirement already satisfied: grpcio>=1.48.2 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (1.78.0)
+Requirement already satisfied: markdown>=2.6.8 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (3.10.2)
+Requirement already satisfied: protobuf!=4.24.0,>=3.19.6 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (7.34.1)
+Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (0.7.2)
+Requirement already satisfied: werkzeug>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (3.1.7)
+Requirement already satisfied: resampy in /usr/local/lib/python3.12/dist-packages (from frechet_audio_distance->-r requirements.txt (line 24)) (0.4.3)
+Requirement already satisfied: torchlibrosa in /usr/local/lib/python3.12/dist-packages (from frechet_audio_distance->-r requirements.txt (line 24)) (0.1.0)
+Requirement already satisfied: laion_clap in /usr/local/lib/python3.12/dist-packages (from frechet_audio_distance->-r requirements.txt (line 24)) (1.1.7)
+Requirement already satisfied: transformers in /usr/local/lib/python3.12/dist-packages (from frechet_audio_distance->-r requirements.txt (line 24)) (4.35.2)
+Requirement already satisfied: encodec in /usr/local/lib/python3.12/dist-packages (from frechet_audio_distance->-r requirements.txt (line 24)) (0.1.1)
+Requirement already satisfied: pycparser in /usr/local/lib/python3.12/dist-packages (from cffi>=1.0->soundfile->-r requirements.txt (line 18)) (3.0)
+Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (2.6.2)
+Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (1.4.0)
+Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (26.1.0)
+Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (1.8.0)
+Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (6.7.1)
+Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (0.5.2)
+Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (1.24.2)
+Requirement already satisfied: idna>=2.0 in /usr/local/lib/python3.12/dist-packages (from yarl<2.0,>=1.17.0->aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (3.11)
+Requirement already satisfied: llvmlite<0.48,>=0.47.0dev0 in /usr/local/lib/python3.12/dist-packages (from numba>=0.51.0->librosa->-r requirements.txt (line 17)) (0.47.0)
+Requirement already satisfied: platformdirs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from pooch>=1.1->librosa->-r requirements.txt (line 17)) (4.10.0)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.8.2->pandas->-r requirements.txt (line 15)) (1.17.0)
+Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests->diffusers==0.18.1->-r requirements.txt (line 5)) (3.4.6)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests->diffusers==0.18.1->-r requirements.txt (line 5)) (2.6.3)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests->diffusers==0.18.1->-r requirements.txt (line 5)) (2026.2.25)
+Requirement already satisfied: threadpoolctl>=3.2.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn>=1.1.0->librosa->-r requirements.txt (line 17)) (3.6.0)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy>=1.13.3->torch->-r requirements.txt (line 2)) (1.3.0)
+Requirement already satisfied: markupsafe>=2.1.1 in /usr/local/lib/python3.12/dist-packages (from werkzeug>=1.0.1->tensorboard->-r requirements.txt (line 23)) (3.0.3)
+Requirement already satisfied: einops in /usr/local/lib/python3.12/dist-packages (from encodec->frechet_audio_distance->-r requirements.txt (line 24)) (0.8.2)
+Requirement already satisfied: zipp>=3.20 in /usr/local/lib/python3.12/dist-packages (from importlib_metadata->diffusers==0.18.1->-r requirements.txt (line 5)) (3.23.0)
+Requirement already satisfied: ftfy in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (6.3.1)
+Requirement already satisfied: braceexpand in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (0.1.7)
+Requirement already satisfied: webdataset in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (1.0.2)
+Requirement already satisfied: wget in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (3.2)
+Requirement already satisfied: wandb in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (0.27.0)
+Requirement already satisfied: h5py in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (3.16.0)
+Requirement already satisfied: progressbar in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (2.5)
+Requirement already satisfied: wcwidth in /usr/local/lib/python3.12/dist-packages (from ftfy->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (0.6.0)
+Requirement already satisfied: tokenizers<0.19,>=0.14 in /usr/local/lib/python3.12/dist-packages (from transformers->frechet_audio_distance->-r requirements.txt (line 24)) (0.15.2)
+Requirement already satisfied: safetensors>=0.3.1 in /usr/local/lib/python3.12/dist-packages (from transformers->frechet_audio_distance->-r requirements.txt (line 24)) (0.7.0)
+Requirement already satisfied: click>=8.2.0 in /usr/local/lib/python3.12/dist-packages (from wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (8.3.1)
+Requirement already satisfied: gitpython!=3.1.29,>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (3.1.50)
+Requirement already satisfied: pydantic<3,>=2.6 in /usr/local/lib/python3.12/dist-packages (from wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (2.13.4)
+Requirement already satisfied: sentry-sdk>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (2.61.0)
+Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3,>=2.6->wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (0.7.0)
+Requirement already satisfied: pydantic-core==2.46.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3,>=2.6->wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (2.46.4)
+Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic<3,>=2.6->wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (0.4.2)
+Requirement already satisfied: gitdb<5,>=4.0.1 in /usr/local/lib/python3.12/dist-packages (from gitpython!=3.1.29,>=1.0.0->wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (4.0.12)
+Requirement already satisfied: smmap<6,>=3.0.1 in /usr/local/lib/python3.12/dist-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.29,>=1.0.0->wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (5.0.3)
+[PoseBeat] Training config: config=configs/motion_audio_adapter.yaml
+[PoseBeat] Launch: gpus=2 batch_size_per_gpu=12 effective_batch_size=24 num_workers_per_gpu=4
+[PoseBeat] NCCL: NCCL_P2P_DISABLE=1 NCCL_IB_DISABLE=1
+[PoseBeat] Logs: logs/dmd_motion_adapter/train_motion_adapter.log plus rank logs when using torchrun
+W0530 04:34:28.927000 85554 torch/distributed/run.py:851] 
+W0530 04:34:28.927000 85554 torch/distributed/run.py:851] *****************************************
+W0530 04:34:28.927000 85554 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0530 04:34:28.927000 85554 torch/distributed/run.py:851] *****************************************
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:441: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:441: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/accelerate/utils/torch_xla.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+/usr/local/lib/python3.12/dist-packages/accelerate/utils/torch_xla.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+2026-05-30 04:34:38 | INFO | posebeat.train.rank1 | logging to /mntdatalora/src/PoseBeat-MusicGen/logs/dmd_motion_adapter/train_motion_adapter_rank1.log
+2026-05-30 04:34:38 | INFO | posebeat.train.rank1 | rank=1 local_rank=1 world_size=2 distributed=True device=cuda:1 dtype=torch.float32
+2026-05-30 04:34:38 | INFO | posebeat.train.rank0 | logging to /mntdatalora/src/PoseBeat-MusicGen/logs/dmd_motion_adapter/train_motion_adapter.log
+2026-05-30 04:34:38 | INFO | posebeat.train.rank0 | config:
+audio:
+  hop_length: 512
+  n_fft: 2048
+  n_iter: 32
+  sample_rate: 22050
+  top_db: 80
+  x_res: 256
+  y_res: 256
+data:
+  dataset_split: train
+  strict_condition_match: true
+evaluation:
+  beat_motion_fps: 30
+  compute_fad: true
+  normalize_gain_db: 8.0
+  normalize_target_dbfs: -20.0
+inference:
+  eta: 0.0
+  seed: 2391504374279719
+logging:
+  log_every_steps: 25
+  tensorboard: true
+model:
+  image_channels: 1
+  motion_dim: 370
+  motion_frames: 150
+paths:
+  cdcd_list: /mntdatalora/src/PoseBeat-MusicGen/configs/cdcd_aist.txt
+  data_root: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26
+  from_pretrained_model_dir: null
+  generated_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/dmd_motion_adapter/generated
+  genre_model_path: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/MS-SincResNet.tar
+  log_dir: /mntdatalora/src/PoseBeat-MusicGen/logs/dmd_motion_adapter
+  normalized_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/dmd_motion_adapter/normalized
+  output_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/dmd_motion_adapter
+  pretrained_model_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/model/all_01
+  test_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/test/wavs_sliced
+  test_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/audio_latents/test
+  test_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/conditions/normalized_all_test_data_01.pkl
+  train_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/train/wavs_sliced
+  train_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/audio_latents/train
+  train_mel_dataset_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/input
+    music/aistpp_256_sorted
+  train_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/conditions/normalized_all_train_data_01.pkl
+  vae_checkpoint_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/model/all_01
+training:
+  adam_beta1: 0.95
+  adam_beta2: 0.999
+  adam_epsilon: 1.0e-08
+  batch_size: 16
+  ema_inv_gamma: 1.0
+  ema_max_decay: 0.9999
+  ema_power: 0.75
+  epochs: 100
+  gradient_clip: 1.0
+  learning_rate: 0.0001
+  lr_scheduler: cosine
+  lr_warmup_steps: 500
+  max_train_samples: null
+  num_train_steps: 1000
+  num_workers: 4
+  save_every_epochs: 10
+  save_every_steps: 1000
+  scheduler: ddim
+  use_ema: true
+  weight_decay: 1.0e-06
+2026-05-30 04:34:38 | INFO | posebeat.train.rank0 | rank=0 local_rank=0 world_size=2 distributed=True device=cuda:0 dtype=torch.float32
+/usr/local/lib/python3.12/dist-packages/datasets/table.py:1421: FutureWarning: promote has been superseded by mode='default'.
+  table = cls._concat_blocks(blocks, axis=0)
+/usr/local/lib/python3.12/dist-packages/datasets/table.py:1421: FutureWarning: promote has been superseded by mode='default'.
+  table = cls._concat_blocks(blocks, axis=0)
+2026-05-30 04:40:21 | INFO | posebeat.train.rank0 | training pairs=17733 image_shape=(1, 256, 256) condition_shape=(150, 370)
+2026-05-30 04:40:21 | INFO | posebeat.train.rank1 | training pairs=17733 image_shape=(1, 256, 256) condition_shape=(150, 370)
+2026-05-30 04:40:40 | INFO | posebeat.train.rank1 | unet params=138.26M
+2026-05-30 04:40:40 | INFO | posebeat.train.rank1 | vae params=83.61M frozen
+2026-05-30 04:40:40 | INFO | posebeat.train.rank1 | cross_attention_dim=370
+2026-05-30 04:40:40 | INFO | posebeat.train.rank0 | unet params=138.26M
+2026-05-30 04:40:40 | INFO | posebeat.train.rank0 | vae params=83.61M frozen
+2026-05-30 04:40:40 | INFO | posebeat.train.rank0 | cross_attention_dim=370
+2026-05-30 04:40:40 | INFO | posebeat.train.rank1 | enabled DistributedDataParallel
+2026-05-30 04:40:40 | INFO | posebeat.train.rank0 | enabled DistributedDataParallel
+2026-05-30 04:40:41 | INFO | posebeat.train.rank1 | EMA enabled
+2026-05-30 04:40:41 | INFO | posebeat.train.rank1 | batch_size_per_process=12 effective_batch_size=24 num_workers_per_process=4 total_workers=8
+2026-05-30 04:40:41 | INFO | posebeat.train.rank1 | starting epoch=1/100
+2026-05-30 04:40:41 | INFO | posebeat.train.rank0 | EMA enabled
+2026-05-30 04:40:41 | INFO | posebeat.train.rank0 | batch_size_per_process=12 effective_batch_size=24 num_workers_per_process=4 total_workers=8
+2026-05-30 04:40:41 | INFO | posebeat.train.rank0 | starting epoch=1/100
+train-epoch-0:   0%|          | 0/739 [00:00<?, ?it/s]/usr/local/lib/python3.12/dist-packages/transformers/deepspeed.py:23: FutureWarning: transformers.deepspeed module is deprecated and will be removed in a future version. Please import deepspeed modules directly from transformers.integrations
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/transformers/deepspeed.py:23: FutureWarning: transformers.deepspeed module is deprecated and will be removed in a future version. Please import deepspeed modules directly from transformers.integrations
+  warnings.warn(
+train-epoch-0:   0%|          | 0/739 [00:05<?, ?it/s, loss=1.08100, step=1]train-epoch-0:   0%|          | 1/739 [00:05<1:12:06,  5.86s/it, loss=1.08100, step=1]train-epoch-0:   0%|          | 1/739 [00:06<1:12:06,  5.86s/it, loss=1.10071, step=2]train-epoch-0:   0%|          | 2/739 [00:06<34:28,  2.81s/it, loss=1.10071, step=2]  train-epoch-0:   0%|          | 2/739 [00:07<34:28,  2.81s/it, loss=1.07859, step=3]train-epoch-0:   0%|          | 3/739 [00:07<22:27,  1.83s/it, loss=1.07859, step=3]train-epoch-0:   0%|          | 3/739 [00:07<22:27,  1.83s/it, loss=1.08862, step=4]train-epoch-0:   1%|          | 4/739 [00:07<17:01,  1.39s/it, loss=1.08862, step=4]train-epoch-0:   1%|          | 4/739 [00:08<17:01,  1.39s/it, loss=1.08970, step=5]train-epoch-0:   1%|          | 5/739 [00:08<13:48,  1.13s/it, loss=1.08970, step=5]train-epoch-0:   1%|          | 5/739 [00:09<13:48,  1.13s/it, loss=1.06172, step=6]train-epoch-0:   1%|          | 6/739 [00:09<11:58,  1.02it/s, loss=1.06172, step=6]train-epoch-0:   1%|          | 6/739 [00:09<11:58,  1.02it/s, loss=1.05382, step=7]train-epoch-0:   1%|          | 7/739 [00:09<10:40,  1.14it/s, loss=1.05382, step=7]train-epoch-0:   1%|          | 7/739 [00:10<10:40,  1.14it/s, loss=1.03946, step=8]train-epoch-0:   1%|          | 8/739 [00:10<09:52,  1.23it/s, loss=1.03946, step=8]train-epoch-0:   1%|          | 8/739 [00:11<09:52,  1.23it/s, loss=1.00240, step=9]train-epoch-0:   1%|          | 9/739 [00:11<09:14,  1.32it/s, loss=1.00240, step=9]train-epoch-0:   1%|          | 9/739 [00:11<09:14,  1.32it/s, loss=0.99208, step=10]train-epoch-0:   1%|▏         | 10/739 [00:11<08:54,  1.36it/s, loss=0.99208, step=10]train-epoch-0:   1%|▏         | 10/739 [00:12<08:54,  1.36it/s, loss=0.96454, step=11]train-epoch-0:   1%|▏         | 11/739 [00:12<08:35,  1.41it/s, loss=0.96454, step=11]train-epoch-0:   1%|▏         | 11/739 [00:13<08:35,  1.41it/s, loss=0.94545, step=12]train-epoch-0:   2%|▏         | 12/739 [00:13<08:23,  1.44it/s, loss=0.94545, step=12]train-epoch-0:   2%|▏         | 12/739 [00:13<08:23,  1.44it/s, loss=0.93226, step=13]train-epoch-0:   2%|▏         | 13/739 [00:13<08:17,  1.46it/s, loss=0.93226, step=13]train-epoch-0:   2%|▏         | 13/739 [00:14<08:17,  1.46it/s, loss=0.89757, step=14]train-epoch-0:   2%|▏         | 14/739 [00:14<08:44,  1.38it/s, loss=0.89757, step=14]train-epoch-0:   2%|▏         | 14/739 [00:16<08:44,  1.38it/s, loss=0.88815, step=15]train-epoch-0:   2%|▏         | 15/739 [00:16<11:43,  1.03it/s, loss=0.88815, step=15]train-epoch-0:   2%|▏         | 15/739 [00:16<11:43,  1.03it/s, loss=0.84769, step=16]train-epoch-0:   2%|▏         | 16/739 [00:16<10:34,  1.14it/s, loss=0.84769, step=16]train-epoch-0:   2%|▏         | 16/739 [00:18<10:34,  1.14it/s, loss=0.81453, step=17]train-epoch-0:   2%|▏         | 17/739 [00:18<12:34,  1.05s/it, loss=0.81453, step=17]train-epoch-0:   2%|▏         | 17/739 [00:19<12:34,  1.05s/it, loss=0.76815, step=18]train-epoch-0:   2%|▏         | 18/739 [00:19<14:41,  1.22s/it, loss=0.76815, step=18]train-epoch-0:   2%|▏         | 18/739 [00:20<14:41,  1.22s/it, loss=0.78021, step=19]train-epoch-0:   3%|▎         | 19/739 [00:20<12:36,  1.05s/it, loss=0.78021, step=19]train-epoch-0:   3%|▎         | 19/739 [00:21<12:36,  1.05s/it, loss=0.69583, step=20]train-epoch-0:   3%|▎         | 20/739 [00:21<11:12,  1.07it/s, loss=0.69583, step=20]train-epoch-0:   3%|▎         | 20/739 [00:21<11:12,  1.07it/s, loss=0.67177, step=21]train-epoch-0:   3%|▎         | 21/739 [00:21<10:12,  1.17it/s, loss=0.67177, step=21]train-epoch-0:   3%|▎         | 21/739 [00:23<10:12,  1.17it/s, loss=0.66031, step=22]train-epoch-0:   3%|▎         | 22/739 [00:23<11:24,  1.05it/s, loss=0.66031, step=22]train-epoch-0:   3%|▎         | 22/739 [00:23<11:24,  1.05it/s, loss=0.64059, step=23]train-epoch-0:   3%|▎         | 23/739 [00:23<10:17,  1.16it/s, loss=0.64059, step=23]train-epoch-0:   3%|▎         | 23/739 [00:24<10:17,  1.16it/s, loss=0.61179, step=24]train-epoch-0:   3%|▎         | 24/739 [00:24<09:39,  1.23it/s, loss=0.61179, step=24]train-epoch-0:   3%|▎         | 24/739 [00:25<09:39,  1.23it/s, loss=0.59131, step=25]2026-05-30 04:41:06 | INFO | posebeat.train.rank0 | step=25 epoch=0 loss=0.591315 avg_loss=0.891930 lr=5.000e-06
+train-epoch-0:   3%|▎         | 25/739 [00:25<09:23,  1.27it/s, loss=0.59131, step=25]train-epoch-0:   3%|▎         | 25/739 [00:26<09:23,  1.27it/s, loss=0.57623, step=26]train-epoch-0:   4%|▎         | 26/739 [00:26<11:19,  1.05it/s, loss=0.57623, step=26]train-epoch-0:   4%|▎         | 26/739 [00:27<11:19,  1.05it/s, loss=0.52090, step=27]train-epoch-0:   4%|▎         | 27/739 [00:27<10:15,  1.16it/s, loss=0.52090, step=27]train-epoch-0:   4%|▎         | 27/739 [00:27<10:15,  1.16it/s, loss=0.54397, step=28]train-epoch-0:   4%|▍         | 28/739 [00:27<09:28,  1.25it/s, loss=0.54397, step=28]train-epoch-0:   4%|▍         | 28/739 [00:28<09:28,  1.25it/s, loss=0.55963, step=29]train-epoch-0:   4%|▍         | 29/739 [00:28<09:13,  1.28it/s, loss=0.55963, step=29]train-epoch-0:   4%|▍         | 29/739 [00:30<09:13,  1.28it/s, loss=0.44136, step=30]train-epoch-0:   4%|▍         | 30/739 [00:30<14:31,  1.23s/it, loss=0.44136, step=30]train-epoch-0:   4%|▍         | 30/739 [00:32<14:31,  1.23s/it, loss=0.37646, step=31]train-epoch-0:   4%|▍         | 31/739 [00:32<15:21,  1.30s/it, loss=0.37646, step=31]train-epoch-0:   4%|▍         | 31/739 [00:33<15:21,  1.30s/it, loss=0.38331, step=32]train-epoch-0:   4%|▍         | 32/739 [00:33<13:02,  1.11s/it, loss=0.38331, step=32]train-epoch-0:   4%|▍         | 32/739 [00:33<13:02,  1.11s/it, loss=0.35939, step=33]train-epoch-0:   4%|▍         | 33/739 [00:33<11:25,  1.03it/s, loss=0.35939, step=33]train-epoch-0:   4%|▍         | 33/739 [00:37<11:25,  1.03it/s, loss=0.36467, step=34]train-epoch-0:   5%|▍         | 34/739 [00:37<21:04,  1.79s/it, loss=0.36467, step=34]train-epoch-0:   5%|▍         | 34/739 [00:38<21:04,  1.79s/it, loss=0.34163, step=35]train-epoch-0:   5%|▍         | 35/739 [00:38<17:02,  1.45s/it, loss=0.34163, step=35]train-epoch-0:   5%|▍         | 35/739 [00:38<17:02,  1.45s/it, loss=0.31681, step=36]train-epoch-0:   5%|▍         | 36/739 [00:38<14:10,  1.21s/it, loss=0.31681, step=36]train-epoch-0:   5%|▍         | 36/739 [00:39<14:10,  1.21s/it, loss=0.24146, step=37]train-epoch-0:   5%|▌         | 37/739 [00:39<12:11,  1.04s/it, loss=0.24146, step=37]train-epoch-0:   5%|▌         | 37/739 [00:42<12:11,  1.04s/it, loss=0.25836, step=38]train-epoch-0:   5%|▌         | 38/739 [00:42<19:32,  1.67s/it, loss=0.25836, step=38]train-epoch-0:   5%|▌         | 38/739 [00:43<19:32,  1.67s/it, loss=0.26211, step=39]train-epoch-0:   5%|▌         | 39/739 [00:43<16:08,  1.38s/it, loss=0.26211, step=39]train-epoch-0:   5%|▌         | 39/739 [00:43<16:08,  1.38s/it, loss=0.28601, step=40]train-epoch-0:   5%|▌         | 40/739 [00:43<13:34,  1.16s/it, loss=0.28601, step=40]train-epoch-0:   5%|▌         | 40/739 [00:44<13:34,  1.16s/it, loss=0.25775, step=41]train-epoch-0:   6%|▌         | 41/739 [00:44<11:45,  1.01s/it, loss=0.25775, step=41]train-epoch-0:   6%|▌         | 41/739 [00:48<11:45,  1.01s/it, loss=0.39063, step=42]train-epoch-0:   6%|▌         | 42/739 [00:49<24:09,  2.08s/it, loss=0.39063, step=42]train-epoch-0:   6%|▌         | 42/739 [00:49<24:09,  2.08s/it, loss=0.18397, step=43]train-epoch-0:   6%|▌         | 43/739 [00:49<19:21,  1.67s/it, loss=0.18397, step=43]train-epoch-0:   6%|▌         | 43/739 [00:50<19:21,  1.67s/it, loss=0.24196, step=44]train-epoch-0:   6%|▌         | 44/739 [00:50<16:03,  1.39s/it, loss=0.24196, step=44]train-epoch-0:   6%|▌         | 44/739 [00:51<16:03,  1.39s/it, loss=0.14974, step=45]train-epoch-0:   6%|▌         | 45/739 [00:51<13:42,  1.19s/it, loss=0.14974, step=45][rank0]:[E530 04:51:33.114079667 ProcessGroupNCCL.cpp:689] [Rank 0] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=890, OpType=ALLREDUCE, NumelIn=279809, NumelOut=279809, Timeout(ms)=600000) ran for 600042 milliseconds before timing out.
+[rank0]:[E530 04:51:33.502698677 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 0]  failure detected by watchdog at work sequence id: 890 PG status: last enqueued work: 908, last completed work: 889
+[rank0]:[E530 04:51:33.648961440 ProcessGroupNCCL.cpp:736] Stack trace of the failed collective not found, potentially because FlightRecorder is disabled. You can enable it by setting TORCH_NCCL_TRACE_BUFFER_SIZE to a non-zero value.
+[rank0]:[E530 04:51:33.754431424 ProcessGroupNCCL.cpp:2636] [PG ID 0 PG GUID 0(default_pg) Rank 0] First PG on this rank to signal dumping.
+[rank0]:[E530 04:51:34.606300343 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 0] Received a dump signal due to a collective timeout from this local rank and we will try our best to dump the debug info. Last enqueued NCCL work: 908, last completed NCCL work: 889.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank1]:[E530 04:51:34.632925276 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 1] Observed flight recorder dump signal from another rank via TCPStore.
+[rank1]:[E530 04:51:34.684273197 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 1] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 889, last completed NCCL work: 889.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank0]:[E530 04:51:34.707134422 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 0] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank1]:[E530 04:51:34.726946283 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 1] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank0]:[E530 04:52:34.854938004 ProcessGroupNCCL.cpp:750] [Rank 0] Some NCCL operations have failed or timed out. Due to the asynchronous nature of CUDA kernels, subsequent GPU operations might run on corrupted/incomplete data.
+[rank0]:[E530 04:52:34.953479117 ProcessGroupNCCL.cpp:764] [Rank 0] To avoid data inconsistency, we are taking the entire process down.
+[rank0]:[E530 04:52:36.169952212 ProcessGroupNCCL.cpp:2119] [PG ID 0 PG GUID 0(default_pg) Rank 0] Process group watchdog thread terminated with exception: [Rank 0] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=890, OpType=ALLREDUCE, NumelIn=279809, NumelOut=279809, Timeout(ms)=600000) ran for 600042 milliseconds before timing out.
+Exception raised from checkTimeout at /pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:692 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x727d3b37205d in /usr/local/lib/python3.12/dist-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x2a7 (0x727c66d3fd87 in /usr/local/lib/python3.12/dist-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::Watchdog::runLoop() + 0x17b1 (0x727c66d451a1 in /usr/local/lib/python3.12/dist-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::Watchdog::run() + 0x157 (0x727c66d46597 in /usr/local/lib/python3.12/dist-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0xecdb4 (0x727d3ae6edb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #5: <unknown function> + 0x9caa4 (0x727d7b292aa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #6: <unknown function> + 0x129c6c (0x727d7b31fc6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+terminate called after throwing an instance of 'c10::DistBackendError'
+  what():  [PG ID 0 PG GUID 0(default_pg) Rank 0] Process group watchdog thread terminated with exception: [Rank 0] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=890, OpType=ALLREDUCE, NumelIn=279809, NumelOut=279809, Timeout(ms)=600000) ran for 600042 milliseconds before timing out.
+Exception raised from checkTimeout at /pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:692 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x727d3b37205d in /usr/local/lib/python3.12/dist-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x2a7 (0x727c66d3fd87 in /usr/local/lib/python3.12/dist-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::Watchdog::runLoop() + 0x17b1 (0x727c66d451a1 in /usr/local/lib/python3.12/dist-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::Watchdog::run() + 0x157 (0x727c66d46597 in /usr/local/lib/python3.12/dist-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0xecdb4 (0x727d3ae6edb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #5: <unknown function> + 0x9caa4 (0x727d7b292aa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #6: <unknown function> + 0x129c6c (0x727d7b31fc6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+Exception raised from run at /pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:2125 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x727d3b37205d in /usr/local/lib/python3.12/dist-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x9b5d75 (0x727c665a6d75 in /usr/local/lib/python3.12/dist-packages/torch/lib/libtorch_cuda.so)
+frame #2: <unknown function> + 0xecdb4 (0x727d3ae6edb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #3: <unknown function> + 0x9caa4 (0x727d7b292aa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #4: <unknown function> + 0x129c6c (0x727d7b31fc6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+W0530 04:52:40.026000 85554 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 85618 closing signal SIGTERM
+E0530 04:52:40.170000 85554 torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: -6) local_rank: 0 (pid: 85617) of binary: /usr/bin/python3
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+=======================================================
+scripts/train_motion_adapter.py FAILED
+-------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-05-30_04:52:40
+  host      : pod-3
+  rank      : 1 (local_rank: 1)
+  exitcode  : -15 (pid: 85618)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 85618
+-------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-05-30_04:52:40
+  host      : pod-3
+  rank      : 0 (local_rank: 0)
+  exitcode  : -6 (pid: 85617)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 85617
+=======================================================
+
+===== restart 2026-05-30T04:55:30+02:00 multi_gpu batch_size_per_gpu=12 num_workers=0 nccl_p2p_disable=1 nccl_ib_disable=1 =====
+[PoseBeat] Installing Python requirements from requirements.txt
+Requirement already satisfied: torch in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 2)) (2.11.0+cu128)
+Requirement already satisfied: torchvision in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 3)) (0.26.0+cu128)
+Requirement already satisfied: torchaudio in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 4)) (2.11.0+cu128)
+Requirement already satisfied: diffusers==0.18.1 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 5)) (0.18.1)
+Requirement already satisfied: accelerate==0.20.3 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 6)) (0.20.3)
+Requirement already satisfied: audiodiffusion in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 7)) (1.5.7)
+Requirement already satisfied: datasets==2.13.1 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 8)) (2.13.1)
+Requirement already satisfied: huggingface_hub==0.16.4 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 9)) (0.16.4)
+Requirement already satisfied: pyarrow<15 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 10)) (14.0.2)
+Requirement already satisfied: fsspec==2023.6.0 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 11)) (2023.6.0)
+Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 14)) (1.26.4)
+Requirement already satisfied: pandas in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 15)) (3.0.3)
+Requirement already satisfied: scipy in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 16)) (1.17.1)
+Requirement already satisfied: librosa in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 17)) (0.11.0)
+Requirement already satisfied: soundfile in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 18)) (0.13.1)
+Requirement already satisfied: pydub in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 19)) (0.25.1)
+Requirement already satisfied: Pillow in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 20)) (12.2.0)
+Requirement already satisfied: PyYAML in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 21)) (6.0.3)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 22)) (4.67.3)
+Requirement already satisfied: tensorboard in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 23)) (2.20.0)
+Requirement already satisfied: frechet_audio_distance in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 24)) (0.3.4)
+Requirement already satisfied: importlib_metadata in /usr/local/lib/python3.12/dist-packages (from diffusers==0.18.1->-r requirements.txt (line 5)) (9.0.0)
+Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from diffusers==0.18.1->-r requirements.txt (line 5)) (3.25.2)
+Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.12/dist-packages (from diffusers==0.18.1->-r requirements.txt (line 5)) (2026.5.9)
+Requirement already satisfied: requests in /usr/local/lib/python3.12/dist-packages (from diffusers==0.18.1->-r requirements.txt (line 5)) (2.32.5)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from accelerate==0.20.3->-r requirements.txt (line 6)) (26.0)
+Requirement already satisfied: psutil in /usr/local/lib/python3.12/dist-packages (from accelerate==0.20.3->-r requirements.txt (line 6)) (7.2.2)
+Requirement already satisfied: dill<0.3.7,>=0.3.0 in /usr/local/lib/python3.12/dist-packages (from datasets==2.13.1->-r requirements.txt (line 8)) (0.3.6)
+Requirement already satisfied: xxhash in /usr/local/lib/python3.12/dist-packages (from datasets==2.13.1->-r requirements.txt (line 8)) (3.7.0)
+Requirement already satisfied: multiprocess in /usr/local/lib/python3.12/dist-packages (from datasets==2.13.1->-r requirements.txt (line 8)) (0.70.14)
+Requirement already satisfied: aiohttp in /usr/local/lib/python3.12/dist-packages (from datasets==2.13.1->-r requirements.txt (line 8)) (3.13.5)
+Requirement already satisfied: typing-extensions>=3.7.4.3 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub==0.16.4->-r requirements.txt (line 9)) (4.15.0)
+Requirement already satisfied: setuptools<82 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (81.0.0)
+Requirement already satisfied: sympy>=1.13.3 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (1.14.0)
+Requirement already satisfied: networkx>=2.5.1 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (3.6.1)
+Requirement already satisfied: jinja2 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (3.1.6)
+Requirement already satisfied: cuda-toolkit==12.8.1 in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.1)
+Requirement already satisfied: cuda-bindings<13,>=12.9.4 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (12.9.4)
+Requirement already satisfied: nvidia-cudnn-cu12==9.19.0.56 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (9.19.0.56)
+Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (0.7.1)
+Requirement already satisfied: nvidia-nccl-cu12==2.28.9 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (2.28.9)
+Requirement already satisfied: nvidia-nvshmem-cu12==3.4.5 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (3.4.5)
+Requirement already satisfied: triton==3.6.0 in /usr/local/lib/python3.12/dist-packages (from torch->-r requirements.txt (line 2)) (3.6.0)
+Requirement already satisfied: nvidia-cublas-cu12==12.8.4.1.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.4.1)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.8.90.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.90)
+Requirement already satisfied: nvidia-cufft-cu12==11.3.3.83.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (11.3.3.83)
+Requirement already satisfied: nvidia-cufile-cu12==1.13.1.3.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (1.13.1.3)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.8.90.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.90)
+Requirement already satisfied: nvidia-curand-cu12==10.3.9.90.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (10.3.9.90)
+Requirement already satisfied: nvidia-cusolver-cu12==11.7.3.90.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (11.7.3.90)
+Requirement already satisfied: nvidia-cusparse-cu12==12.5.8.93.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.5.8.93)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.8.93.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.93)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.8.93.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.93)
+Requirement already satisfied: nvidia-nvtx-cu12==12.8.90.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==12.8.1; platform_system == "Linux"->torch->-r requirements.txt (line 2)) (12.8.90)
+Requirement already satisfied: cuda-pathfinder~=1.1 in /usr/local/lib/python3.12/dist-packages (from cuda-bindings<13,>=12.9.4->torch->-r requirements.txt (line 2)) (1.2.2)
+Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.12/dist-packages (from pandas->-r requirements.txt (line 15)) (2.9.0.post0)
+Requirement already satisfied: audioread>=2.1.9 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (3.1.0)
+Requirement already satisfied: numba>=0.51.0 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (0.65.1)
+Requirement already satisfied: scikit-learn>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (1.8.0)
+Requirement already satisfied: joblib>=1.0 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (1.5.3)
+Requirement already satisfied: decorator>=4.3.0 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (5.2.1)
+Requirement already satisfied: pooch>=1.1 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (1.9.0)
+Requirement already satisfied: soxr>=0.3.2 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (1.1.0)
+Requirement already satisfied: lazy_loader>=0.1 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (0.5)
+Requirement already satisfied: msgpack>=1.0 in /usr/local/lib/python3.12/dist-packages (from librosa->-r requirements.txt (line 17)) (1.1.2)
+Requirement already satisfied: cffi>=1.0 in /usr/local/lib/python3.12/dist-packages (from soundfile->-r requirements.txt (line 18)) (2.0.0)
+Requirement already satisfied: absl-py>=0.4 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (2.4.0)
+Requirement already satisfied: grpcio>=1.48.2 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (1.78.0)
+Requirement already satisfied: markdown>=2.6.8 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (3.10.2)
+Requirement already satisfied: protobuf!=4.24.0,>=3.19.6 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (7.34.1)
+Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (0.7.2)
+Requirement already satisfied: werkzeug>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from tensorboard->-r requirements.txt (line 23)) (3.1.7)
+Requirement already satisfied: resampy in /usr/local/lib/python3.12/dist-packages (from frechet_audio_distance->-r requirements.txt (line 24)) (0.4.3)
+Requirement already satisfied: torchlibrosa in /usr/local/lib/python3.12/dist-packages (from frechet_audio_distance->-r requirements.txt (line 24)) (0.1.0)
+Requirement already satisfied: laion_clap in /usr/local/lib/python3.12/dist-packages (from frechet_audio_distance->-r requirements.txt (line 24)) (1.1.7)
+Requirement already satisfied: transformers in /usr/local/lib/python3.12/dist-packages (from frechet_audio_distance->-r requirements.txt (line 24)) (4.35.2)
+Requirement already satisfied: encodec in /usr/local/lib/python3.12/dist-packages (from frechet_audio_distance->-r requirements.txt (line 24)) (0.1.1)
+Requirement already satisfied: pycparser in /usr/local/lib/python3.12/dist-packages (from cffi>=1.0->soundfile->-r requirements.txt (line 18)) (3.0)
+Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (2.6.2)
+Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (1.4.0)
+Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (26.1.0)
+Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (1.8.0)
+Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (6.7.1)
+Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (0.5.2)
+Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (1.24.2)
+Requirement already satisfied: idna>=2.0 in /usr/local/lib/python3.12/dist-packages (from yarl<2.0,>=1.17.0->aiohttp->datasets==2.13.1->-r requirements.txt (line 8)) (3.11)
+Requirement already satisfied: llvmlite<0.48,>=0.47.0dev0 in /usr/local/lib/python3.12/dist-packages (from numba>=0.51.0->librosa->-r requirements.txt (line 17)) (0.47.0)
+Requirement already satisfied: platformdirs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from pooch>=1.1->librosa->-r requirements.txt (line 17)) (4.10.0)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.8.2->pandas->-r requirements.txt (line 15)) (1.17.0)
+Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests->diffusers==0.18.1->-r requirements.txt (line 5)) (3.4.6)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests->diffusers==0.18.1->-r requirements.txt (line 5)) (2.6.3)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests->diffusers==0.18.1->-r requirements.txt (line 5)) (2026.2.25)
+Requirement already satisfied: threadpoolctl>=3.2.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn>=1.1.0->librosa->-r requirements.txt (line 17)) (3.6.0)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy>=1.13.3->torch->-r requirements.txt (line 2)) (1.3.0)
+Requirement already satisfied: markupsafe>=2.1.1 in /usr/local/lib/python3.12/dist-packages (from werkzeug>=1.0.1->tensorboard->-r requirements.txt (line 23)) (3.0.3)
+Requirement already satisfied: einops in /usr/local/lib/python3.12/dist-packages (from encodec->frechet_audio_distance->-r requirements.txt (line 24)) (0.8.2)
+Requirement already satisfied: zipp>=3.20 in /usr/local/lib/python3.12/dist-packages (from importlib_metadata->diffusers==0.18.1->-r requirements.txt (line 5)) (3.23.0)
+Requirement already satisfied: ftfy in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (6.3.1)
+Requirement already satisfied: braceexpand in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (0.1.7)
+Requirement already satisfied: webdataset in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (1.0.2)
+Requirement already satisfied: wget in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (3.2)
+Requirement already satisfied: wandb in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (0.27.0)
+Requirement already satisfied: h5py in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (3.16.0)
+Requirement already satisfied: progressbar in /usr/local/lib/python3.12/dist-packages (from laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (2.5)
+Requirement already satisfied: wcwidth in /usr/local/lib/python3.12/dist-packages (from ftfy->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (0.6.0)
+Requirement already satisfied: tokenizers<0.19,>=0.14 in /usr/local/lib/python3.12/dist-packages (from transformers->frechet_audio_distance->-r requirements.txt (line 24)) (0.15.2)
+Requirement already satisfied: safetensors>=0.3.1 in /usr/local/lib/python3.12/dist-packages (from transformers->frechet_audio_distance->-r requirements.txt (line 24)) (0.7.0)
+Requirement already satisfied: click>=8.2.0 in /usr/local/lib/python3.12/dist-packages (from wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (8.3.1)
+Requirement already satisfied: gitpython!=3.1.29,>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (3.1.50)
+Requirement already satisfied: pydantic<3,>=2.6 in /usr/local/lib/python3.12/dist-packages (from wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (2.13.4)
+Requirement already satisfied: sentry-sdk>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (2.61.0)
+Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3,>=2.6->wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (0.7.0)
+Requirement already satisfied: pydantic-core==2.46.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3,>=2.6->wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (2.46.4)
+Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic<3,>=2.6->wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (0.4.2)
+Requirement already satisfied: gitdb<5,>=4.0.1 in /usr/local/lib/python3.12/dist-packages (from gitpython!=3.1.29,>=1.0.0->wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (4.0.12)
+Requirement already satisfied: smmap<6,>=3.0.1 in /usr/local/lib/python3.12/dist-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.29,>=1.0.0->wandb->laion_clap->frechet_audio_distance->-r requirements.txt (line 24)) (5.0.3)
+[PoseBeat] Training config: config=configs/motion_audio_adapter.yaml
+[PoseBeat] Launch: gpus=2 batch_size_per_gpu=12 effective_batch_size=24 num_workers_per_gpu=0
+[PoseBeat] NCCL: NCCL_P2P_DISABLE=1 NCCL_IB_DISABLE=1
+[PoseBeat] Logs: logs/dmd_motion_adapter/train_motion_adapter.log plus rank logs when using torchrun
+W0530 04:55:33.771000 107481 torch/distributed/run.py:851] 
+W0530 04:55:33.771000 107481 torch/distributed/run.py:851] *****************************************
+W0530 04:55:33.771000 107481 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0530 04:55:33.771000 107481 torch/distributed/run.py:851] *****************************************
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:441: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:441: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/accelerate/utils/torch_xla.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+/usr/local/lib/python3.12/dist-packages/accelerate/utils/torch_xla.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py:309: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  _torch_pytree._register_pytree_node(
+2026-05-30 04:55:42 | INFO | posebeat.train.rank0 | logging to /mntdatalora/src/PoseBeat-MusicGen/logs/dmd_motion_adapter/train_motion_adapter.log
+2026-05-30 04:55:42 | INFO | posebeat.train.rank1 | logging to /mntdatalora/src/PoseBeat-MusicGen/logs/dmd_motion_adapter/train_motion_adapter_rank1.log
+2026-05-30 04:55:42 | INFO | posebeat.train.rank1 | rank=1 local_rank=1 world_size=2 distributed=True device=cuda:1 dtype=torch.float32
+2026-05-30 04:55:42 | INFO | posebeat.train.rank0 | config:
+audio:
+  hop_length: 512
+  n_fft: 2048
+  n_iter: 32
+  sample_rate: 22050
+  top_db: 80
+  x_res: 256
+  y_res: 256
+data:
+  dataset_split: train
+  strict_condition_match: true
+evaluation:
+  beat_motion_fps: 30
+  compute_fad: true
+  normalize_gain_db: 8.0
+  normalize_target_dbfs: -20.0
+inference:
+  eta: 0.0
+  seed: 2391504374279719
+logging:
+  log_every_steps: 25
+  tensorboard: true
+model:
+  image_channels: 1
+  motion_dim: 370
+  motion_frames: 150
+paths:
+  cdcd_list: /mntdatalora/src/PoseBeat-MusicGen/configs/cdcd_aist.txt
+  data_root: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26
+  from_pretrained_model_dir: null
+  generated_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/dmd_motion_adapter/generated
+  genre_model_path: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/MS-SincResNet.tar
+  log_dir: /mntdatalora/src/PoseBeat-MusicGen/logs/dmd_motion_adapter
+  normalized_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/dmd_motion_adapter/normalized
+  output_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/dmd_motion_adapter
+  pretrained_model_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/model/all_01
+  test_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/test/wavs_sliced
+  test_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/audio_latents/test
+  test_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/conditions/normalized_all_test_data_01.pkl
+  train_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/train/wavs_sliced
+  train_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/audio_latents/train
+  train_mel_dataset_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/input
+    music/aistpp_256_sorted
+  train_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/conditions/normalized_all_train_data_01.pkl
+  vae_checkpoint_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/model/all_01
+training:
+  adam_beta1: 0.95
+  adam_beta2: 0.999
+  adam_epsilon: 1.0e-08
+  batch_size: 16
+  ema_inv_gamma: 1.0
+  ema_max_decay: 0.9999
+  ema_power: 0.75
+  epochs: 100
+  gradient_clip: 1.0
+  learning_rate: 0.0001
+  lr_scheduler: cosine
+  lr_warmup_steps: 500
+  max_train_samples: null
+  num_train_steps: 1000
+  num_workers: 4
+  save_every_epochs: 10
+  save_every_steps: 1000
+  scheduler: ddim
+  use_ema: true
+  weight_decay: 1.0e-06
+2026-05-30 04:55:42 | INFO | posebeat.train.rank0 | rank=0 local_rank=0 world_size=2 distributed=True device=cuda:0 dtype=torch.float32

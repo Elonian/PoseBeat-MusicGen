@@ -1,19 +1,21 @@
 paths:
-  data_root: /mntdatalora/src/PoseBeat-MusicGen/data/aistpp_legacy
-  train_mel_dataset_dir: /mntdatalora/src/PoseBeat-MusicGen/data/aistpp_legacy/data_and_model/input music/aistpp_256_sorted
-  vae_checkpoint_dir: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/teticio_latent_audio_diffusion_ddim_256
-  pretrained_model_dir: /mntdatalora/src/PoseBeat-MusicGen/data/aistpp_legacy/data_and_model/model/all_01
+  data_root: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26
+  train_mel_dataset_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/input music/aistpp_256_sorted
+  vae_checkpoint_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/model/all_01
+  pretrained_model_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/model/all_01
   from_pretrained_model_dir: null
-  train_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/aistpp_legacy/data_and_model/conditions/normalized_all_train_data_01.pkl
-  test_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/aistpp_legacy/data_and_model/conditions/normalized_all_test_data_01.pkl
-  train_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/aistpp_legacy/train/wavs_sliced
-  test_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/aistpp_legacy/test/wavs_sliced
-  train_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/aistpp_legacy/audio_latents/train
-  test_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/aistpp_legacy/audio_latents/test
+  train_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/conditions/normalized_all_train_data_01.pkl
+  test_motion_pickle: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/data_and_model/conditions/normalized_all_test_data_01.pkl
+  train_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/train/wavs_sliced
+  test_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/test/wavs_sliced
+  train_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/audio_latents/train
+  test_latent_dir: /mntdatalora/src/PoseBeat-MusicGen/data/dmd_aistpp_legacy_2026-05-26/audio_latents/test
   cdcd_list: /mntdatalora/src/PoseBeat-MusicGen/configs/cdcd_aist.txt
-  output_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_music
-  generated_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_music/generated
-  normalized_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/motion_music/normalized
+  output_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/dmd_motion_adapter
+  log_dir: /mntdatalora/src/PoseBeat-MusicGen/logs/dmd_motion_adapter
+  generated_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/dmd_motion_adapter/generated
+  normalized_audio_dir: /mntdatalora/src/PoseBeat-MusicGen/outputs/dmd_motion_adapter/normalized
+  genre_model_path: /mntdatalora/src/PoseBeat-MusicGen/cache_weights/MS-SincResNet.tar
 
 data:
   dataset_split: train
@@ -34,7 +36,7 @@ model:
   motion_dim: 370
 
 training:
-  batch_size: 8
+  batch_size: 16
   epochs: 100
   learning_rate: 0.0001
   adam_beta1: 0.95
@@ -42,7 +44,7 @@ training:
   adam_epsilon: 0.00000001
   weight_decay: 0.000001
   gradient_clip: 1.0
-  num_workers: 2
+  num_workers: 4
   scheduler: ddim
   num_train_steps: 1000
   lr_scheduler: cosine
@@ -58,6 +60,12 @@ training:
 inference:
   seed: 2391504374279719
   eta: 0.0
+
+evaluation:
+  normalize_target_dbfs: -20.0
+  normalize_gain_db: 8.0
+  beat_motion_fps: 30
+  compute_fad: true
 
 logging:
   log_every_steps: 25
