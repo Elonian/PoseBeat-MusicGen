@@ -16,6 +16,46 @@ def match_target_amplitude(sound, target_dbfs: float):
     return sound.apply_gain(target_dbfs - sound.dBFS)
 
 
+def _normalize_with_soundfile(
+    audio_path: Path,
+    output_path: Path,
+    *,
+    target_dbfs: float,
+    gain_db: float,
+    first_seconds: float,
+) -> bool:
+    try:
+        import soundfile as sf
+    except Exception:
+        return False
+
+    try:
+        audio, sample_rate = sf.read(audio_path, dtype="float32", always_2d=False)
+    except Exception:
+        return False
+
+    import numpy as np
+
+    if audio.ndim > 1:
+        audio = audio.mean(axis=1)
+    frame_count = int(round(first_seconds * sample_rate))
+    if frame_count > 0:
+        audio = audio[:frame_count]
+    if audio.size == 0:
+        return False
+
+    rms = float(np.sqrt(np.mean(np.square(audio, dtype=np.float64))))
+    if rms > 0:
+        current_dbfs = 20.0 * np.log10(rms)
+        audio = audio * float(10.0 ** ((target_dbfs - current_dbfs + gain_db) / 20.0))
+    elif gain_db:
+        audio = audio * float(10.0 ** (gain_db / 20.0))
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    sf.write(output_path, np.clip(audio, -1.0, 1.0), sample_rate, subtype="PCM_16")
+    return True
+
+
 def normalize_folder(
     input_dir: Path,
     output_dir: Path,
@@ -28,12 +68,21 @@ def normalize_folder(
     from pydub import AudioSegment
 
     for audio_path in tqdm(sorted(input_dir.glob("*.wav")), desc="normalize-loudness"):
+        output_path = output_dir / audio_path.name
+        if _normalize_with_soundfile(
+            audio_path,
+            output_path,
+            target_dbfs=target_dbfs,
+            gain_db=gain_db,
+            first_seconds=first_seconds,
+        ):
+            continue
         sound = AudioSegment.from_file(audio_path, format="wav")
         window = sound[: int(first_seconds * 1000)]
         normalized = match_target_amplitude(window, target_dbfs)
         if gain_db:
             normalized = normalized.apply_gain(gain_db)
-        normalized.export(output_dir / audio_path.name, format="wav")
+        normalized.export(output_path, format="wav")
 
 
 def main() -> None:
