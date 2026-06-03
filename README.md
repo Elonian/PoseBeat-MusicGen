@@ -6,6 +6,18 @@ PoseBeat MusicGen is a motion to music generation system for AIST++ dance. It le
 
 The system converts paired audio into mel spectrogram images, encodes those images with a frozen VAE, and trains a conditional UNet to predict diffusion noise in latent space while attending to the full motion sequence. At inference time, no reference audio is supplied. A saved local Diffusers and AudioDiffusion pipeline receives only the motion tensor, samples the latent denoising trajectory, decodes the mel representation, and returns waveform audio. The final evaluation compares beat alignment, Frechet Audio Distance, paired FAD, and genre distribution divergence on the CDCD subset, showing a clear tradeoff between stronger beat alignment in the high resolution model and stronger distribution metrics in the base model.
 
+## Motion Demo
+
+Click a preview to open the MP4 demo with generated audio.
+
+| Break base | Break high resolution |
+| --- | --- |
+| [![Break base motion demo](outputs/notebook_examples/human_motion_mp4/_previews/gBR_sBM_cAll_d04_mBR0_ch02_slice1_BR_base_human_motion_t2s.png)](outputs/notebook_examples/human_motion_mp4/gBR_sBM_cAll_d04_mBR0_ch02_slice1_BR_base_human_motion.mp4) | [![Break high resolution motion demo](outputs/notebook_examples/human_motion_mp4/_previews/gBR_sBM_cAll_d04_mBR0_ch02_slice1_BR_full_hires_human_motion_t2s.png)](outputs/notebook_examples/human_motion_mp4/gBR_sBM_cAll_d04_mBR0_ch02_slice1_BR_full_hires_human_motion.mp4) |
+
+| Pop base | Pop high resolution |
+| --- | --- |
+| [![Pop base motion demo](outputs/notebook_examples/human_motion_mp4/_previews/gPO_sBM_cAll_d11_mPO1_ch02_slice1_PO_base_human_motion_t2s.png)](outputs/notebook_examples/human_motion_mp4/gPO_sBM_cAll_d11_mPO1_ch02_slice1_PO_base_human_motion.mp4) | [![Pop high resolution motion demo](outputs/notebook_examples/human_motion_mp4/_previews/gPO_sBM_cAll_d11_mPO1_ch02_slice1_PO_full_hires_human_motion_t2s.png)](outputs/notebook_examples/human_motion_mp4/gPO_sBM_cAll_d11_mPO1_ch02_slice1_PO_full_hires_human_motion.mp4) |
+
 ## Method
 
 This section keeps the mathematical model, training objective, inference procedure, and evaluation definitions in one place.
@@ -14,19 +26,15 @@ This section keeps the mathematical model, training objective, inference procedu
 
 For each five second AIST++ slice, let the motion condition be
 
-$$
-\begin{aligned}
-C &= [c_1, c_2, \ldots, c_T] \in \mathbb{R}^{T \times D}, \\
-T &= 150, \\
-D &= 370.
-\end{aligned}
-$$
+$$ C = [c_1, c_2, \ldots, c_T] \in \mathbb{R}^{T \times D} $$
+
+$$ T = 150 $$
+
+$$ D = 370 $$
 
 The model learns a conditional distribution over audio:
 
-$$
-p_{\theta}(x \mid C)
-$$
+$$ p_{\theta}(x \mid C) $$
 
 where $x$ is the target waveform or, operationally, the mel spectrogram image derived from that waveform. The project does not feed the reference audio into the generator at inference time. The reference audio is used for training targets, listening comparison, and evaluation.
 
@@ -34,40 +42,31 @@ where $x$ is the target waveform or, operationally, the mel spectrogram image de
 
 Each frame condition is represented as
 
-$$
-\begin{aligned}
-c_t &= [m_t, a_t], \\
-m_t &\in \mathbb{R}^{360}, \\
-a_t &\in \mathbb{R}^{10}.
-\end{aligned}
-$$
+$$ c_t = [m_t, a_t] $$
+
+$$ m_t \in \mathbb{R}^{360} $$
+
+$$ a_t \in \mathbb{R}^{10} $$
 
 The first 360 channels can be viewed as 24 joints with 15 values per joint:
 
-$$
-M_t = \mathrm{reshape}(m_t, 24, 15) \in \mathbb{R}^{24 \times 15}
-$$
+$$ M_t = reshape(m_t, 24, 15) \in \mathbb{R}^{24 \times 15} $$
 
 The position part of each joint block is represented by channels 6 through 8:
 
-$$
-p_{t,j}^{\mathrm{cond}} = M_t[j, 6{:}9] \in \mathbb{R}^{3}
-$$
+$$ p_{t,j}^{cond} = M_t[j, 6{:}9] \in \mathbb{R}^{3} $$
 
-Raw AIST++ SMPL motion uses axis angle rotations and root translation. For joint $j$ with parent $\mathrm{pa}(j)$, local axis angle rotations are converted to rotation matrices, and forward kinematics recursively computes global joint positions:
+Raw AIST++ SMPL motion uses axis angle rotations and root translation. For joint $j$ with parent $pa(j)$, local axis angle rotations are converted to rotation matrices, and forward kinematics recursively computes global joint positions:
 
-$$
-\begin{aligned}
-R_{t,j}^{\mathrm{local}} &= \mathrm{Rodrigues}(r_{t,j}), \\
-P_{t,\mathrm{root}} &= q_t, \\
-R_{t,\mathrm{root}}^{\mathrm{global}} &= R_{t,\mathrm{root}}^{\mathrm{local}}, \\
-P_{t,j} &= P_{t,\mathrm{pa}(j)}
-          + R_{t,\mathrm{pa}(j)}^{\mathrm{global}} o_j, \\
-R_{t,j}^{\mathrm{global}} &=
-R_{t,\mathrm{pa}(j)}^{\mathrm{global}}
-R_{t,j}^{\mathrm{local}}.
-\end{aligned}
-$$
+$$ R_{t,j}^{local} = Rodrigues(r_{t,j}) $$
+
+$$ P_{t,root} = q_t $$
+
+$$ R_{t,root}^{global} = R_{t,root}^{local} $$
+
+$$ P_{t,j} = P_{t,pa(j)} + R_{t,pa(j)}^{global} o_j $$
+
+$$ R_{t,j}^{global} = R_{t,pa(j)}^{global} R_{t,j}^{local} $$
 
 Here $o_j$ is the SMPL joint offset. The same equations describe how raw SMPL pose can be converted into global 3D joint positions, while normalized condition space positions can be read directly from $M_t[j, 6{:}9]$.
 
@@ -75,23 +74,17 @@ Here $o_j$ is the SMPL joint offset. The same equations describe how raw SMPL po
 
 Training does not directly denoise waveform samples. A waveform slice is converted to a mel spectrogram image:
 
-$$
-x \mapsto I \in [-1, 1]^{C_{\mathrm{img}} \times H \times W}
-$$
+$$ x \mapsto I \in [-1, 1]^{C_{img} \times H \times W} $$
 
 The base model uses $H = W = 256$; the high resolution model uses $H = W = 512$. A frozen VAE encoder maps the mel image into latent space:
 
-$$
-z_0 = s \, E_{\phi}(I)
-$$
+$$ z_0 = s \, E_{\phi}(I) $$
 
 where $E_{\phi}$ is the VAE encoder and $s$ is the VAE scaling factor. In the code this is handled by `encode_images_to_latents()` in `utils/audio_latents.py`.
 
 The VAE remains frozen:
 
-$$
-\nabla_{\phi} \mathcal{L} = 0
-$$
+$$ \nabla_{\phi} \mathcal{L} = 0 $$
 
 Only the conditional denoising UNet is optimized.
 
@@ -99,24 +92,17 @@ Only the conditional denoising UNet is optimized.
 
 The trainable denoiser is
 
-$$
-\epsilon_{\theta}(z_t, t, C)
-$$
+$$ \epsilon_{\theta}(z_t, t, C) $$
 
 where $z_t$ is the noisy latent at diffusion timestep $t$, and $C$ is the full motion conditioning sequence. The implementation passes $C$ to Diffusers as `encoder_hidden_states`, so the UNet cross attention blocks can attend over the 150 motion frames:
 
-$$
-\begin{aligned}
-Q_t &= W_Q h(z_t), \\
-K_C &= W_K C, \\
-V_C &= W_V C, \\
-\mathrm{CrossAttn}(Q_t, K_C, V_C)
-&= \mathrm{softmax}
-\left(
-\frac{Q_t K_C^{\top}}{\sqrt{d_k}}
-\right)V_C.
-\end{aligned}
-$$
+$$ Q_t = W_Q h(z_t) $$
+
+$$ K_C = W_K C $$
+
+$$ V_C = W_V C $$
+
+$$ A_t = softmax((Q_t K_C^T) / \sqrt{d_k}) V_C $$
 
 The base conditional UNet uses four down and up blocks with cross attention in the first three down blocks and last three up blocks. The high resolution `wide_64` variant uses five blocks and adds another cross attention level for the 512x512 mel setting.
 
@@ -130,20 +116,13 @@ noise_pred = unet(noisy_latents, timesteps, encoder_hidden_states=conditioning).
 
 During training, clean latents are noised according to a scheduler with cumulative noise coefficient $\bar{\alpha}_t$:
 
-$$
-\begin{aligned}
-z_t
-&= \sqrt{\bar{\alpha}_t}\,z_0
- + \sqrt{1 - \bar{\alpha}_t}\,\epsilon, \\
-\epsilon &\sim \mathcal{N}(0, I).
-\end{aligned}
-$$
+$$ z_t = \sqrt{\bar{\alpha}_t} z_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon $$
+
+$$ \epsilon \sim \mathcal{N}(0, I) $$
 
 The timestep $t$ is sampled uniformly from the training diffusion horizon:
 
-$$
-t \sim \mathrm{Uniform}\{0, \ldots, N - 1\}
-$$
+$$ t \sim U\{0, \ldots, N - 1\} $$
 
 The saved configs use $N = 1000$ training timesteps.
 
@@ -151,27 +130,13 @@ The saved configs use $N = 1000$ training timesteps.
 
 The UNet is trained to predict the exact noise added to the clean latent:
 
-$$
-\hat{\epsilon}_t = \epsilon_{\theta}(z_t, t, C)
-$$
+$$ \hat{\epsilon}_t = \epsilon_{\theta}(z_t, t, C) $$
 
 The optimization objective is mean squared error:
 
-$$
-\begin{aligned}
-\mathcal{L}_{\mathrm{simple}}(\theta)
-&=
-\mathbb{E}_{z_0, C, t, \epsilon}
-\left[
-\left\|
-\epsilon -
-\epsilon_{\theta}(z_t, t, C)
-\right\|_2^2
-\right], \\
-\theta^{*}
-&= \arg\min_{\theta}\mathcal{L}_{\mathrm{simple}}(\theta).
-\end{aligned}
-$$
+$$ \mathcal{L}_{simple}(\theta) = \mathbb{E}_{z_0, C, t, \epsilon}[\lVert \epsilon - \epsilon_{\theta}(z_t, t, C) \rVert_2^2] $$
+
+$$ \theta^* = \arg\min_{\theta} \mathcal{L}_{simple}(\theta) $$
 
 In code:
 
@@ -185,36 +150,25 @@ The optimizer is AdamW with cosine learning rate scheduling, warmup, gradient cl
 
 At inference time, the model starts from Gaussian latent noise:
 
-$$
-z_N \sim \mathcal{N}(0, I)
-$$
+$$ z_N \sim \mathcal{N}(0, I) $$
 
 For each reverse diffusion step, the scheduler uses the denoiser prediction and the motion condition:
 
-$$
-\hat{\epsilon}_t = \epsilon_{\theta}(z_t, t, C)
-$$
+$$ \hat{\epsilon}_t = \epsilon_{\theta}(z_t, t, C) $$
 
 The scheduler then computes the previous latent:
 
-$$
-z_{t - 1} = f_{\mathrm{sched}}(z_t, \hat{\epsilon}_t, t)
-$$
+$$ z_{t - 1} = f_{sched}(z_t, \hat{\epsilon}_t, t) $$
 
 After the final reverse step, the VAE decoder maps the latent mel image back through the AudioDiffusion pipeline:
 
-$$
-\begin{aligned}
-\hat{I} &= D_{\phi}(z_0 / s), \\
-\hat{x} &= \mathrm{Mel}^{-1}(\hat{I}).
-\end{aligned}
-$$
+$$ \hat{I} = D_{\phi}(z_0 / s) $$
+
+$$ \hat{x} = Mel^{-1}(\hat{I}) $$
 
 The generated WAV is then clipped to `[-1, 1]` before writing:
 
-$$
-\tilde{x} = \mathrm{clip}(\hat{x}, -1, 1)
-$$
+$$ \tilde{x} = clip(\hat{x}, -1, 1) $$
 
 The saved inference seed is `2391504374279719` and the saved `eta` value is `0.0`.
 
@@ -222,31 +176,15 @@ The saved inference seed is `2391504374279719` and the saved `eta` value is `0.0
 
 Generated WAVs are normalized before evaluation. The soundfile path estimates RMS loudness:
 
-$$
-\begin{aligned}
-\mathrm{rms}(x)
-&= \sqrt{\frac{1}{n}\sum_{i = 1}^{n} x_i^2}, \\
-\mathrm{dBFS}(x)
-&= 20 \log_{10}\left(\mathrm{rms}(x)\right).
-\end{aligned}
-$$
+$$ rms(x) = \sqrt{\frac{1}{n}\sum_{i = 1}^{n} x_i^2} $$
+
+$$ dBFS(x) = 20 \log_{10}(rms(x)) $$
 
 The gain is chosen to match the target loudness and then add the configured gain offset:
 
-$$
-\begin{aligned}
-g &=
-10^{
-\left(
-\mathrm{targetDBFS}
-- \mathrm{dBFS}(x)
-+ \mathrm{gainDB}
-\right) / 20
-}, \\
-x_{\mathrm{norm}} &=
-\mathrm{clip}(g x, -1, 1).
-\end{aligned}
-$$
+$$ g = 10^{(targetDBFS - dBFS(x) + gainDB) / 20} $$
+
+$$ x_{norm} = clip(gx, -1, 1) $$
 
 ### Evaluation Metrics
 
@@ -254,92 +192,23 @@ Evaluation uses the 31 file CDCD subset in `configs/cdcd_aist.txt`. The saved fi
 
 Beat coverage and beat hit use one onset bin per second. Let $b_i$ be the reference beat indicator for second $i$, and let $\hat{b}_i$ be the generated beat indicator:
 
-$$
-\begin{aligned}
-\mathrm{coverage}
-&=
-\frac{\sum_i \hat{b}_i}{\sum_i b_i}, \\
-\mathrm{hit}
-&=
-\frac{
-\sum_i \mathbf{1}[b_i = 1 \land \hat{b}_i = 1]
-}{
-\sum_i b_i
-}.
-\end{aligned}
-$$
+$$ coverage = \frac{\sum_i \hat{b}_i}{\sum_i b_i} $$
+
+$$ hit = \frac{\sum_i 1[b_i = 1 \land \hat{b}_i = 1]}{\sum_i b_i} $$
 
 Frechet Audio Distance compares embedding distributions from reference and generated audio. If embeddings are approximated as Gaussians $(\mu_r, \Sigma_r)$ and $(\mu_g, \Sigma_g)$, the FAD form is:
 
-$$
-\begin{aligned}
-\mathrm{FAD}
-&=
-\|\mu_r - \mu_g\|_2^2
-+ \mathrm{Tr}
-\left(
-\Sigma_r + \Sigma_g
-- 2(\Sigma_r \Sigma_g)^{1/2}
-\right).
-\end{aligned}
-$$
+$$ FAD = \lVert \mu_r - \mu_g \rVert_2^2 + Tr(\Sigma_r + \Sigma_g - 2(\Sigma_r \Sigma_g)^{1/2}) $$
 
 DMD style FAD uses all 186 reference test WAVs against the 31 generated CDCD WAVs. Paired CDCD FAD uses only the same 31 reference and generated pairs.
 
 Genre KLD uses MS SincResNet predictions. If $p$ is the reference genre distribution and $q$ is the generated genre distribution:
 
-$$
-\begin{aligned}
-D_{\mathrm{KL}}(p \parallel q)
-&=
-\sum_{k = 1}^{K} p_k \log \frac{p_k}{q_k}.
-\end{aligned}
-$$
+$$ D_{KL}(p \parallel q) = \sum_{k = 1}^{K} p_k \log \frac{p_k}{q_k} $$
 
 Lower FAD and lower genre KLD are better. Higher beat coverage and beat hit are better.
 
 ## Output Gallery
-
-### Motion Demo
-
-
-The MP4 demos below pair the rendered human motion with generated music. Use the video controls to play the audio track embedded in each file.
-
-**Break example, base model**
-
-<video controls preload="metadata" width="100%">
-  <source src="outputs/notebook_examples/human_motion_mp4/gBR_sBM_cAll_d04_mBR0_ch02_slice1_BR_base_human_motion.mp4" type="video/mp4">
-  Open the base Break motion demo: outputs/notebook_examples/human_motion_mp4/gBR_sBM_cAll_d04_mBR0_ch02_slice1_BR_base_human_motion.mp4
-</video>
-
-[Open base Break motion demo](outputs/notebook_examples/human_motion_mp4/gBR_sBM_cAll_d04_mBR0_ch02_slice1_BR_base_human_motion.mp4)
-
-**Break example, high resolution model**
-
-<video controls preload="metadata" width="100%">
-  <source src="outputs/notebook_examples/human_motion_mp4/gBR_sBM_cAll_d04_mBR0_ch02_slice1_BR_full_hires_human_motion.mp4" type="video/mp4">
-  Open the high resolution Break motion demo: outputs/notebook_examples/human_motion_mp4/gBR_sBM_cAll_d04_mBR0_ch02_slice1_BR_full_hires_human_motion.mp4
-</video>
-
-[Open high resolution Break motion demo](outputs/notebook_examples/human_motion_mp4/gBR_sBM_cAll_d04_mBR0_ch02_slice1_BR_full_hires_human_motion.mp4)
-
-**Pop example, base model**
-
-<video controls preload="metadata" width="100%">
-  <source src="outputs/notebook_examples/human_motion_mp4/gPO_sBM_cAll_d11_mPO1_ch02_slice1_PO_base_human_motion.mp4" type="video/mp4">
-  Open the base Pop motion demo: outputs/notebook_examples/human_motion_mp4/gPO_sBM_cAll_d11_mPO1_ch02_slice1_PO_base_human_motion.mp4
-</video>
-
-[Open base Pop motion demo](outputs/notebook_examples/human_motion_mp4/gPO_sBM_cAll_d11_mPO1_ch02_slice1_PO_base_human_motion.mp4)
-
-**Pop example, high resolution model**
-
-<video controls preload="metadata" width="100%">
-  <source src="outputs/notebook_examples/human_motion_mp4/gPO_sBM_cAll_d11_mPO1_ch02_slice1_PO_full_hires_human_motion.mp4" type="video/mp4">
-  Open the high resolution Pop motion demo: outputs/notebook_examples/human_motion_mp4/gPO_sBM_cAll_d11_mPO1_ch02_slice1_PO_full_hires_human_motion.mp4
-</video>
-
-[Open high resolution Pop motion demo](outputs/notebook_examples/human_motion_mp4/gPO_sBM_cAll_d11_mPO1_ch02_slice1_PO_full_hires_human_motion.mp4)
 
 ### Dataset Overview
 
