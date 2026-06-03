@@ -45,7 +45,7 @@ $$
 The first 360 channels can be viewed as 24 joints with 15 values per joint:
 
 $$
-M_t = \operatorname{reshape}(m_t, 24, 15) \in \mathbb{R}^{24 \times 15}
+M_t = \mathrm{reshape}(m_t, 24, 15) \in \mathbb{R}^{24 \times 15}
 $$
 
 The position part of each joint block is represented by channels 6 through 8:
@@ -54,17 +54,17 @@ $$
 p_{t,j}^{\mathrm{cond}} = M_t[j, 6{:}9] \in \mathbb{R}^{3}
 $$
 
-Raw AIST++ SMPL motion uses axis angle rotations and root translation. For joint $j$ with parent $\operatorname{pa}(j)$, local axis angle rotations are converted to rotation matrices, and forward kinematics recursively computes global joint positions:
+Raw AIST++ SMPL motion uses axis angle rotations and root translation. For joint $j$ with parent $\mathrm{pa}(j)$, local axis angle rotations are converted to rotation matrices, and forward kinematics recursively computes global joint positions:
 
 $$
 \begin{aligned}
-R_{t,j}^{\mathrm{local}} &= \operatorname{Rodrigues}(r_{t,j}), \\
+R_{t,j}^{\mathrm{local}} &= \mathrm{Rodrigues}(r_{t,j}), \\
 P_{t,\mathrm{root}} &= q_t, \\
 R_{t,\mathrm{root}}^{\mathrm{global}} &= R_{t,\mathrm{root}}^{\mathrm{local}}, \\
-P_{t,j} &= P_{t,\operatorname{pa}(j)}
-          + R_{t,\operatorname{pa}(j)}^{\mathrm{global}} o_j, \\
+P_{t,j} &= P_{t,\mathrm{pa}(j)}
+          + R_{t,\mathrm{pa}(j)}^{\mathrm{global}} o_j, \\
 R_{t,j}^{\mathrm{global}} &=
-R_{t,\operatorname{pa}(j)}^{\mathrm{global}}
+R_{t,\mathrm{pa}(j)}^{\mathrm{global}}
 R_{t,j}^{\mathrm{local}}.
 \end{aligned}
 $$
@@ -110,8 +110,8 @@ $$
 Q_t &= W_Q h(z_t), \\
 K_C &= W_K C, \\
 V_C &= W_V C, \\
-\operatorname{CrossAttn}(Q_t, K_C, V_C)
-&= \operatorname{softmax}
+\mathrm{CrossAttn}(Q_t, K_C, V_C)
+&= \mathrm{softmax}
 \left(
 \frac{Q_t K_C^{\top}}{\sqrt{d_k}}
 \right)V_C.
@@ -142,7 +142,7 @@ $$
 The timestep $t$ is sampled uniformly from the training diffusion horizon:
 
 $$
-t \sim \operatorname{Uniform}\{0, \ldots, N - 1\}
+t \sim \mathrm{Uniform}\{0, \ldots, N - 1\}
 $$
 
 The saved configs use $N = 1000$ training timesteps.
@@ -206,14 +206,14 @@ After the final reverse step, the VAE decoder maps the latent mel image back thr
 $$
 \begin{aligned}
 \hat{I} &= D_{\phi}(z_0 / s), \\
-\hat{x} &= \operatorname{Mel}^{-1}(\hat{I}).
+\hat{x} &= \mathrm{Mel}^{-1}(\hat{I}).
 \end{aligned}
 $$
 
 The generated WAV is then clipped to `[-1, 1]` before writing:
 
 $$
-\tilde{x} = \operatorname{clip}(\hat{x}, -1, 1)
+\tilde{x} = \mathrm{clip}(\hat{x}, -1, 1)
 $$
 
 The saved inference seed is `2391504374279719` and the saved `eta` value is `0.0`.
@@ -224,10 +224,10 @@ Generated WAVs are normalized before evaluation. The soundfile path estimates RM
 
 $$
 \begin{aligned}
-\operatorname{rms}(x)
+\mathrm{rms}(x)
 &= \sqrt{\frac{1}{n}\sum_{i = 1}^{n} x_i^2}, \\
-\operatorname{dBFS}(x)
-&= 20 \log_{10}\left(\operatorname{rms}(x)\right).
+\mathrm{dBFS}(x)
+&= 20 \log_{10}\left(\mathrm{rms}(x)\right).
 \end{aligned}
 $$
 
@@ -238,13 +238,13 @@ $$
 g &=
 10^{
 \left(
-\operatorname{targetDBFS}
-- \operatorname{dBFS}(x)
-+ \operatorname{gainDB}
+\mathrm{targetDBFS}
+- \mathrm{dBFS}(x)
++ \mathrm{gainDB}
 \right) / 20
 }, \\
 x_{\mathrm{norm}} &=
-\operatorname{clip}(g x, -1, 1).
+\mathrm{clip}(g x, -1, 1).
 \end{aligned}
 $$
 
@@ -256,10 +256,10 @@ Beat coverage and beat hit use one onset bin per second. Let $b_i$ be the refere
 
 $$
 \begin{aligned}
-\operatorname{coverage}
+\mathrm{coverage}
 &=
 \frac{\sum_i \hat{b}_i}{\sum_i b_i}, \\
-\operatorname{hit}
+\mathrm{hit}
 &=
 \frac{
 \sum_i \mathbf{1}[b_i = 1 \land \hat{b}_i = 1]
@@ -273,10 +273,10 @@ Frechet Audio Distance compares embedding distributions from reference and gener
 
 $$
 \begin{aligned}
-\operatorname{FAD}
+\mathrm{FAD}
 &=
 \|\mu_r - \mu_g\|_2^2
-+ \operatorname{Tr}
++ \mathrm{Tr}
 \left(
 \Sigma_r + \Sigma_g
 - 2(\Sigma_r \Sigma_g)^{1/2}
